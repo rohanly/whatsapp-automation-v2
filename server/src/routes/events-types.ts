@@ -1,4 +1,4 @@
-import CrudRouter from "@/utils/crud-router";
+import CrudRouter from "~/utils/crud-router";
 import { z } from "zod";
 import { EventTable, eventTypesTable } from "../models/event-types";
 import { db } from "../db";

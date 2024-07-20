@@ -1,7 +1,7 @@
 import { Hono } from "hono";
-import { db } from "@/server/db";
+import { db } from "~/db";
 import { eq } from "drizzle-orm";
-import { peopleTable, SelectPeople } from "@/server/models/people";
+import { peopleTable, SelectPeople } from "~/models/people";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { peopleToRelationTypeTable } from "../models/people-to-relation-types";

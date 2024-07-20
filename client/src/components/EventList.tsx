@@ -39,44 +39,46 @@ import { useQuery } from "@tanstack/react-query";
 import { formatDate } from "@/utils/date";
 import { Badge } from "./ui/badge";
 import { Event, People } from "@/types";
+import { getEventList } from "@/api/events.service";
 
 export const columns: ColumnDef<Event>[] = [
   {
-    accessorKey: "expand",
+    accessorKey: "people",
     header: "Name",
 
     cell: ({ row }) => {
-      const { person }: any = row.getValue("expand");
-
-      return <div className="flex gap-1">{person?.name}</div>;
+      const people: any = row.getValue("people");
+      return <div className="flex gap-1">{people?.name}</div>;
     },
   },
 
   {
-    accessorKey: "name",
+    accessorKey: "events",
     header: "Event",
-    cell: ({ row }) => (
-      <div className="capitalize font-medium">{row.getValue("name")}</div>
-    ),
-  },
-
-  {
-    accessorKey: "relation",
-    header: () => <div className="text-left">Relation(s)</div>,
     cell: ({ row }) => {
-      const { person }: any = row.getValue("expand");
+      const event: any = row.getValue("events");
 
-      return (
-        <div className="flex gap-1">
-          {person?.expand?.relation.map((item, index) => (
-            <Badge variant="outline" key={index}>
-              {item.label}
-            </Badge>
-          ))}
-        </div>
-      );
+      return <div className="capitalize font-medium">{event?.name}</div>;
     },
   },
+
+  // {
+  //   accessorKey: "relation",
+  //   header: () => <div className="text-left">Relation(s)</div>,
+  //   cell: ({ row }) => {
+  //     const { person }: any = row.getValue("expand");
+
+  //     return (
+  //       <div className="flex gap-1">
+  //         {person?.expand?.relation.map((item, index) => (
+  //           <Badge variant="outline" key={index}>
+  //             {item.label}
+  //           </Badge>
+  //         ))}
+  //       </div>
+  //     );
+  //   },
+  // },
 
   {
     accessorKey: "date",
@@ -93,8 +95,8 @@ export const columns: ColumnDef<Event>[] = [
       );
     },
     cell: ({ row }) => {
-      const date = row.getValue("date");
-      return <div className="lowercase">{formatDate(date)}</div>;
+      const events = row.getValue("events");
+      return <div className="lowercase">{formatDate(events?.date)}</div>;
     },
   },
 
@@ -102,8 +104,6 @@ export const columns: ColumnDef<Event>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original;
-
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -123,12 +123,9 @@ export const columns: ColumnDef<Event>[] = [
 ];
 
 export function EventList() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["events"],
-    queryFn: (): Promise<Event[]> =>
-      pb.collection("events").getFullList({
-        expand: "person, person.relation",
-      }),
+  const { data: events, isLoading } = useQuery({
+    queryKey: ["getEventList"],
+    queryFn: () => getEventList(),
   });
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -140,7 +137,7 @@ export function EventList() {
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data,
+    data: events?.data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -159,8 +156,10 @@ export function EventList() {
   });
 
   if (isLoading) {
-    return <div>isLoading</div>;
+    return <div>Loading...</div>;
   }
+
+  console.log("EVENTS: ", events);
 
   return (
     <div className="w-full">

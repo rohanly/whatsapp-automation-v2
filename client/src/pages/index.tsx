@@ -17,7 +17,8 @@ const pages = createBrowserRouter([
 
   {
     path: "/",
-    element: <ProtectedRoute />,
+    // TODO: to be removed
+    // element: <ProtectedRoute />,
     children: [
       {
         path: "/",

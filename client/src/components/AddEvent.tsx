@@ -35,6 +35,9 @@ import {
 import { People } from "@/types";
 import { Calendar } from "./ui/calendar";
 import { DatePicker } from "./DatePicker";
+import { getPeopleList } from "@/api/people.service";
+import { createEvent, getEventTypeList } from "@/api/events.service";
+import { getTemplateList } from "@/api/templates.service";
 
 export function AddEvent() {
   const [open, setOpen] = useState(false);
@@ -52,9 +55,7 @@ export function AddEvent() {
 
   const mutation = useMutation({
     mutationKey: ["events"],
-    mutationFn: (data: FormFields) => {
-      return pb.collection("events").create(data);
-    },
+    mutationFn: (data: FormFields) => createEvent(data),
     onSuccess: (resp) => {
       console.log(resp);
       reset();
@@ -65,23 +66,17 @@ export function AddEvent() {
 
   const { data: peopleList } = useQuery({
     queryKey: ["getPeopleList"],
-    queryFn: (): Promise<People[]> =>
-      pb.collection("people").getFullList({
-        sort: "-created",
-        expand: "relation",
-      }),
+    queryFn: () => getPeopleList(),
   });
 
   const { data: eventTypes, ...eventTypeQuery } = useQuery({
-    queryKey: ["getEventTypes"],
-    queryFn: () => pb.collection("event_types").getFullList(),
+    queryKey: ["getEventTypeList"],
+    queryFn: () => getEventTypeList(),
   });
 
   const { data: templates, ...templateQuery } = useQuery({
-    queryKey: ["getTemplates"],
-    queryFn: () => {
-      return pb.collection("templates").getFullList();
-    },
+    queryKey: ["getTemplateList"],
+    queryFn: () => getTemplateList(),
   });
 
   const onSubmit: SubmitHandler<FormFields> = (data) => {
@@ -117,7 +112,7 @@ export function AddEvent() {
               Type
             </Label>
             <Controller
-              name="type"
+              name="eventTypeId"
               control={control}
               render={({ field }) => (
                 <div className="flex flex-col gap-1">
@@ -129,24 +124,25 @@ export function AddEvent() {
                       <SelectValue
                         placeholder={
                           field.value
-                            ? eventTypes?.find((ev) => ev.id == field.value)
-                                ?.name
+                            ? eventTypes?.data?.find(
+                                (ev) => ev.id == field.value
+                              )?.name
                             : "Select type"
                         }
                         defaultValue={field.value}
                       />
                     </SelectTrigger>
                     <SelectContent>
-                      {eventTypes?.map((eventType) => (
+                      {eventTypes?.data?.map((eventType) => (
                         <SelectItem value={eventType.id}>
                           {eventType.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  {errors.type?.message && (
+                  {errors.eventTypeId?.message && (
                     <p className="text-xs text-red-500 col-span-4">
-                      {errors.type?.message}
+                      {errors.eventTypeId?.message}
                     </p>
                   )}
                 </div>
@@ -173,7 +169,7 @@ export function AddEvent() {
               Person
             </Label>
             <Controller
-              name="person"
+              name="personId"
               control={control}
               render={({ field }) => (
                 <Select
@@ -184,7 +180,7 @@ export function AddEvent() {
                     <SelectValue placeholder="Select Person" />
                   </SelectTrigger>
                   <SelectContent>
-                    {peopleList?.map((p, i) => (
+                    {peopleList?.data?.map((p, i) => (
                       <SelectItem key={i} value={p.id}>
                         {p.name}
                       </SelectItem>
@@ -201,7 +197,7 @@ export function AddEvent() {
               <span className="italic ml-2">(optional)</span>
             </Label>
             <Controller
-              name="template"
+              name="templateId"
               control={control}
               render={({ field }) => (
                 <Select

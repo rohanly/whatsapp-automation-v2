@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import fs from "fs/promises";
-import { db } from "@/server/db";
-import { storage } from "@/server/storage";
+import { db } from "~/db";
+import { storage } from "~/storage";
 import { usersTable } from "../models/users";
 import { eq } from "drizzle-orm";
 

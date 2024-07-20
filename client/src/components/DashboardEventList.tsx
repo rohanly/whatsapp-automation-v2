@@ -25,17 +25,12 @@ import { formatDate } from "@/utils/date";
 import { type Relation } from "@/types";
 import { toast } from "./ui/use-toast";
 import { ToastAction } from "./ui/toast";
+import { generateMessageForEvent, getEventList } from "@/api/events.service";
 
 export default function DashboardEventList() {
   const { data: events, isLoading } = useQuery({
-    queryKey: ["getTodayEvents"],
-    queryFn: () => {
-      return pb.collection("events").getFullList({
-        // filter: `date>="${formatDate(new Date())}"`,
-        sort: "-created",
-        expand: "person, person.relation",
-      });
-    },
+    queryKey: ["getEventList"],
+    queryFn: () => getEventList(),
   });
 
   if (isLoading) {
@@ -70,8 +65,13 @@ export default function DashboardEventList() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {events?.map((event: any) => (
-              <EventTableRow key={event.id} event={event} />
+            {events?.data?.map((eventData: any, i) => (
+              <EventTableRow
+                key={i}
+                event={eventData?.events}
+                eventType={eventData?.event_types}
+                person={eventData?.people}
+              />
             ))}
           </TableBody>
         </Table>
@@ -85,14 +85,13 @@ export default function DashboardEventList() {
   );
 }
 
-export const EventTableRow = ({ event }: any) => {
+export const EventTableRow = ({ event, eventType, person }: any) => {
   const navigate = useNavigate();
 
   const mutation = useMutation({
-    mutationKey: ["generatedMessage", event.id],
-    mutationFn: () => {
-      return pb.send(`/api/events/${event.id}/generate`, {});
-    },
+    mutationKey: ["generatedMessage", event?.id],
+
+    mutationFn: () => generateMessageForEvent(event?.id),
     onSuccess: () => {
       toast({
         title: "Message generated Successfully",
@@ -109,13 +108,14 @@ export const EventTableRow = ({ event }: any) => {
   });
   return (
     <TableRow key={event.id}>
-      <TableCell className="font-medium">
-        {event.expand?.person?.name}
-      </TableCell>
+      <TableCell className="font-medium">{person?.name}</TableCell>
 
-      <TableCell className="hidden md:table-cell">{event.name}</TableCell>
+      <TableCell className="hidden md:table-cell">
+        <Badge variant="outline">{eventType?.name}</Badge>
+      </TableCell>
+      {/* TODO: Add people relations */}
       <TableCell>
-        {event.expand?.person?.expand?.relation?.map((relation: Relation) => (
+        {person?.expand?.relation?.map((relation: Relation) => (
           <Badge key={relation.id} variant="outline">
             {relation.label}
           </Badge>

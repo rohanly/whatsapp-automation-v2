@@ -7,7 +7,7 @@ export default function DashboardPage() {
     <DashboardLayout>
       <main className="h-full flex flex-col lg:flex-row gap-8">
         <DashboardEventList />
-        <DashboardMessageList />
+        {/* <DashboardMessageList /> */}
       </main>
     </DashboardLayout>
   );

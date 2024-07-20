@@ -1,10 +1,10 @@
-import CrudRouter from "@/utils/crud-router";
+import CrudRouter from "~/utils/crud-router";
 import { Hono } from "hono";
 import { z } from "zod";
-import { eventsTable } from "../models/events";
-import { db } from "../db";
-import { eventTypesTable } from "../models/event-types";
-import { peopleTable } from "../models/people";
+import { eventsTable } from "~/models/events";
+import { db } from "~/db";
+import { eventTypesTable } from "~/models/event-types";
+import { peopleTable } from "~/models/people";
 
 const createEventSchema = z.object({
   name: z.string().optional(),
