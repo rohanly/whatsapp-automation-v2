@@ -38,6 +38,35 @@ CREATE TABLE `messages` (
 	FOREIGN KEY (`receipt`) REFERENCES `people`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
+CREATE TABLE `people` (
+	`id` text PRIMARY KEY NOT NULL,
+	`name` text NOT NULL,
+	`date_of_birth` text,
+	`salutation` text,
+	`meta_data` text,
+	`additional_info` text,
+	`image` text,
+	`email` text,
+	`gender` text NOT NULL,
+	`mobile` text,
+	`extended_family` integer,
+	`company` text,
+	`social_link` text,
+	`ex` integer,
+	`created_at` text DEFAULT (current_timestamp) NOT NULL,
+	`updated_at` text DEFAULT (current_timestamp) NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `relation_types` (
+	`id` text PRIMARY KEY NOT NULL,
+	`name` text NOT NULL,
+	`person` text,
+	`chapter` text,
+	`created_at` text DEFAULT (current_timestamp) NOT NULL,
+	`updated_at` text DEFAULT (current_timestamp) NOT NULL,
+	FOREIGN KEY (`person`) REFERENCES `people`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
 CREATE TABLE `templates` (
 	`id` text PRIMARY KEY NOT NULL,
 	`image` text,
@@ -48,3 +77,13 @@ CREATE TABLE `templates` (
 	`updated_at` text DEFAULT (current_timestamp) NOT NULL,
 	FOREIGN KEY (`type`) REFERENCES `event_types`(`id`) ON UPDATE no action ON DELETE no action
 );
+--> statement-breakpoint
+CREATE TABLE `users` (
+	`id` text PRIMARY KEY NOT NULL,
+	`name` text NOT NULL,
+	`email` text NOT NULL,
+	`created_at` text DEFAULT (current_timestamp) NOT NULL,
+	`updated_at` text DEFAULT (current_timestamp) NOT NULL
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);

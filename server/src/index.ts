@@ -8,7 +8,6 @@ import { swaggerUI } from "@hono/swagger-ui";
 import { userRouter } from "./routes/users";
 import { relationRouter } from "./routes/relations";
 import { peopleRouter } from "./routes/people";
-import { peopleRelationRouter } from "./routes/people-to-relations";
 import { eventTypesRouter } from "./routes/events-types";
 import { eventsRouter } from "./routes/events";
 import { authRouter } from "./routes";
@@ -49,7 +48,6 @@ apiRouter.route("/auth", authRouter);
 apiRouter.route("/users", userRouter);
 apiRouter.route("/relations", relationRouter);
 apiRouter.route("/people", peopleRouter);
-apiRouter.route("/people_relations", peopleRelationRouter);
 apiRouter.route("/events", eventsRouter.getRouter());
 apiRouter.route("/event_types", eventTypesRouter.getRouter());
 

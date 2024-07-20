@@ -1,6 +1,7 @@
 import { relations, sql } from "drizzle-orm";
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { v4 } from "uuid";
+import { relationTypesTable } from "./relation-types";
 
 export const peopleTable = sqliteTable("people", {
   id: text("id")
@@ -16,7 +17,6 @@ export const peopleTable = sqliteTable("people", {
   gender: text("gender", { enum: ["male", "female", "other"] }).notNull(),
   mobile: text("mobile"),
   extendedFamily: integer("extended_family", { mode: "boolean" }),
-  familyRelation: text("family_relation"),
   company: text("company"),
   socialLink: text("social_link"),
   ex: integer("ex", { mode: "boolean" }),
@@ -28,6 +28,10 @@ export const peopleTable = sqliteTable("people", {
     .default(sql`(current_timestamp)`)
     .$onUpdate(() => sql`(current_timestamp)`),
 });
+
+export const peopleRelations = relations(peopleTable, ({ many }) => ({
+  relations: many(relationTypesTable),
+}));
 
 export type InsertPeople = typeof peopleTable.$inferInsert;
 export type SelectPeople = typeof peopleTable.$inferSelect;
