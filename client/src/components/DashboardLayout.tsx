@@ -218,7 +218,7 @@ export default function DashboardLayout({
             className
           )}
         >
-          <RetroGrid className="h-[100px] w-[90%] -z-10" />
+          {showHeader && <RetroGrid className="h-[100px] w-[90%] -z-10" />}
           {children}
         </main>
       </div>

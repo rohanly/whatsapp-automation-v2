@@ -38,16 +38,16 @@ function TemplateList() {
     },
   });
 
-  if (isLoading) return <p>Loading...</p>;
+  // if (isLoading) return <p>Loading...</p>;
 
-  return (
+  return data?.length ? (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {data?.length ? (
-        data?.map((item) => <TemplateItem key={item.id} data={item} />)
-      ) : (
-        <NoTemplates />
-      )}
+      {data?.map((item) => (
+        <TemplateItem key={item.id} data={item} />
+      ))}
     </div>
+  ) : (
+    <NoTemplates />
   );
 }
 
