@@ -4,7 +4,11 @@ import { Label } from "@/components/ui/label";
 import { CalendarIcon, X } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { FormFields, personFormSchema } from "@/schemas/people";
+import {
+  editPersonFormSchema,
+  FormFields,
+  personFormSchema,
+} from "@/schemas/people";
 import { Calendar } from "@/components/ui/calendar";
 import { MultiSelect } from "./ui/multiselect";
 import { cn } from "@/lib/utils";
@@ -27,10 +31,24 @@ import {
 } from "@/components/ui/select";
 
 import { useToast } from "./ui/use-toast";
+import {
+  createPeopleRelation,
+  deletePeopleRelation,
+  editPersonById,
+  getPersonById,
+} from "@/api/people.service";
+import { convertToFormData } from "@/utils";
 
 export function EditPeople({ id }: { id: string }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const [preview, setPreview] = useState(null);
+
+  const { data: person } = useQuery({
+    queryKey: ["getPersonById", id],
+    queryFn: () => getPersonById(id),
+  });
 
   const {
     handleSubmit,
@@ -41,33 +59,33 @@ export function EditPeople({ id }: { id: string }) {
     setValue,
     watch,
   } = useForm<FormFields>({
-    resolver: zodResolver(personFormSchema),
+    resolver: zodResolver(editPersonFormSchema),
     reValidateMode: "onChange",
-  });
-  const [preview, setPreview] = useState(null);
-
-  const { data: person } = useQuery({
-    queryKey: ["getPersonById", id],
-    queryFn: () => {
-      if (!id) return null;
-      return pb.collection("people").getOne(id, {
-        expand: "relation",
-      });
-    },
   });
 
   const mutation = useMutation({
     mutationKey: ["people"],
-    mutationFn: async (fields: FormFields) => {
-      const formData = new FormData();
+    mutationFn: async (data: FormFields) => {
+      const { relation, dateOfBirth, ...rest } = data;
+      const formData = convertToFormData({
+        ...rest,
+        dateOfBirth: dateOfBirth?.toISOString(),
+      });
 
-      const { image, ...data } = fields;
+      const person = await editPersonById(id, formData);
 
-      if (!String(image).includes("http://")) {
-        formData.append("image", image);
-        const resp = await pb.collection("people").update(id, formData);
+      await deletePeopleRelation(id);
+
+      if (relation.length) {
+        for (let relationId of relation) {
+          await createPeopleRelation({
+            personId: id,
+            relationTypeId: relationId,
+          });
+        }
       }
-      return pb.collection("people").update(id, data);
+
+      return person;
     },
     onSuccess: (resp) => {
       console.log(resp);
@@ -86,24 +104,6 @@ export function EditPeople({ id }: { id: string }) {
     mutation.mutate(data);
   };
 
-  useEffect(() => {
-    if (!person) return;
-    (async () => {
-      setValue("name", person.name);
-      setValue("salutation", person.salutation);
-      setValue("date_of_birth", new Date(person.date_of_birth));
-      setValue("gender", person.gender);
-      setValue("relation", person.expand?.relation);
-      setValue("email", person.email);
-      setValue("mobile", person.mobile);
-      setValue("social_link", person.social_link);
-      setValue("company", person.company);
-      setValue("additional_info", person.additional_info);
-      const url = pb.files.getUrl(person, person.image);
-      setValue("image", url);
-    })();
-  }, [person]);
-
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -116,6 +116,26 @@ export function EditPeople({ id }: { id: string }) {
       setPreview(null);
     }
   };
+
+  useEffect(() => {
+    if (!person) return;
+    reset({
+      additionalInfo: person?.additionalInfo,
+      company: person?.company,
+      dateOfBirth: new Date(person?.dateOfBirth),
+      gender: person?.gender,
+      email: person?.email,
+      ex: person?.ex,
+      extendedFamily: person?.extendedFamily,
+      image: person?.image,
+      metaData: person?.metaData,
+      mobile: person?.mobile,
+      name: person?.name,
+      salutation: person?.name,
+      socialLink: person?.socialLink,
+      relation: person?.relations?.map((r) => r?.relationType),
+    });
+  }, [person]);
 
   return (
     <div className="h-full">
@@ -134,9 +154,7 @@ export function EditPeople({ id }: { id: string }) {
                   <div className="col-span-4 flex justify-start items-center">
                     <div className="relative">
                       <img
-                        src={
-                          isValidHttpUrl(field.value) ? field.value : preview
-                        }
+                        src={preview || field.value}
                         className=" w-[60px] rounded-lg object-contain"
                       />
                       <div
@@ -185,11 +203,11 @@ export function EditPeople({ id }: { id: string }) {
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="date_of_birth" className="text-left">
+            <Label htmlFor="dateOfBirth" className="text-left">
               Date of Birth
             </Label>
             <Controller
-              name="date_of_birth"
+              name="dateOfBirth"
               control={control}
               render={({ field }) => (
                 <div className="col-span-4 ">
@@ -291,14 +309,14 @@ export function EditPeople({ id }: { id: string }) {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="social_link" className="text-left">
+            <Label htmlFor="socialLink" className="text-left">
               Social link
             </Label>
             <Input
               id="social_link"
               className="col-span-4 "
-              {...register("social_link")}
-              error={errors?.social_link?.message}
+              {...register("socialLink")}
+              error={errors?.socialLink?.message}
             />
           </div>
 
@@ -315,13 +333,13 @@ export function EditPeople({ id }: { id: string }) {
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-left">
+            <Label htmlFor="additionalInfo" className="text-left">
               Additional Info
             </Label>
             <Textarea
               className="col-span-4"
               placeholder="Type your message here."
-              {...register("additional_info")}
+              {...register("additionalInfo")}
             />
           </div>
         </div>

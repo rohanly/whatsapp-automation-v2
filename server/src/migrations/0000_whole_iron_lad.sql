@@ -18,7 +18,7 @@ CREATE TABLE `events` (
 	`template` text,
 	`created_at` text DEFAULT (current_timestamp) NOT NULL,
 	`updated_at` text DEFAULT (current_timestamp) NOT NULL,
-	FOREIGN KEY (`person`) REFERENCES `people`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`person`) REFERENCES `people`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`type`) REFERENCES `event_types`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`template`) REFERENCES `templates`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -44,7 +44,7 @@ CREATE TABLE `people_relations` (
 	`relation` text,
 	`created_at` text DEFAULT (current_timestamp) NOT NULL,
 	`updated_at` text DEFAULT (current_timestamp) NOT NULL,
-	FOREIGN KEY (`person`) REFERENCES `people`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`person`) REFERENCES `people`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`relation`) REFERENCES `relation_types`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint

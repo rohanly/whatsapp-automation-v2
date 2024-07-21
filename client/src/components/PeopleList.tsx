@@ -54,6 +54,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { deletePeople, getPeopleList } from "@/api/people.service";
 
 export const columns: ColumnDef<People>[] = [
   // {
@@ -85,11 +86,12 @@ export const columns: ColumnDef<People>[] = [
     accessorKey: "image",
     header: "Profile",
     cell: ({ row }) => {
-      const url = pb.files.getUrl(row.original, row.getValue("image"));
-
       return (
         <div className="flex justify-start items-center">
-          <img src={url} className="w-[60px] rounded-lg object-contain" />
+          <img
+            src={row.getValue("image")}
+            className="w-[60px] rounded-lg object-contain"
+          />
         </div>
       );
     },
@@ -102,16 +104,16 @@ export const columns: ColumnDef<People>[] = [
     ),
   },
   {
-    accessorKey: "expand",
+    accessorKey: "relations",
     header: () => <div className="text-left">Relation(s)</div>,
     cell: ({ row }) => {
-      const { relation }: any = row.getValue("expand");
+      const relations: any = row.getValue("relations");
 
       return (
         <div className="flex gap-1">
-          {relation.map((item, index) => (
-            <Badge variant="outline" key={index}>
-              {item.label}
+          {relations.map((relation: any) => (
+            <Badge variant="outline" key={relation?.id}>
+              {relation?.relationType?.name}
             </Badge>
           ))}
         </div>
@@ -126,7 +128,7 @@ export const columns: ColumnDef<People>[] = [
     },
   },
   {
-    accessorKey: "date_of_birth",
+    accessorKey: "dateOfBirth",
     header: ({ column }) => {
       return (
         <Button
@@ -140,17 +142,17 @@ export const columns: ColumnDef<People>[] = [
       );
     },
     cell: ({ row }) => {
-      const dob = row.getValue("date_of_birth");
+      const dob = row.getValue("dateOfBirth");
       return <div className="lowercase">{formatDate(dob)}</div>;
     },
   },
   {
-    accessorKey: "additional_info",
+    accessorKey: "additionalInfo",
     header: () => <div className="">Info</div>,
     cell: ({ row }) => {
       return (
         <div className="w-[80px] truncate">
-          {row.getValue("additional_info") || "-"}
+          {row.getValue("additionalInfo") || "-"}
         </div>
       );
     },
@@ -194,7 +196,11 @@ export const columns: ColumnDef<People>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() => {
-                meta.navigate("/people/" + row.original.id);
+                meta.navigate("/people/" + row.original.id, {
+                  state: {
+                    person: row.original,
+                  },
+                });
               }}
             >
               Edit
@@ -215,13 +221,9 @@ export const columns: ColumnDef<People>[] = [
 ];
 
 export function PeopleList() {
-  const { data, isLoading } = useQuery({
+  const { data: people, isLoading } = useQuery({
     queryKey: ["getPeopleList"],
-    queryFn: (): Promise<People[]> =>
-      pb.collection("people").getFullList({
-        sort: "-created",
-        expand: "relation",
-      }),
+    queryFn: getPeopleList,
   });
 
   const queryClient = useQueryClient();
@@ -231,15 +233,7 @@ export function PeopleList() {
 
   const mutation = useMutation({
     mutationKey: ["deletePeople"],
-    mutationFn: async () => {
-      const events = await pb.collection("events").getFullList({
-        filter: `person="${selectedId}"`,
-      });
-      events.forEach(async (event) => {
-        await pb.collection("events").delete(event.id);
-      });
-      return pb.collection("people").delete(selectedId);
-    },
+    mutationFn: () => deletePeople(selectedId),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["getPeopleList"],
@@ -263,7 +257,7 @@ export function PeopleList() {
   };
 
   const table = useReactTable({
-    data,
+    data: people?.data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -288,6 +282,8 @@ export function PeopleList() {
   if (isLoading) {
     return <div>isLoading</div>;
   }
+
+  console.log("DATA: ", people.data);
 
   return (
     <div className="w-full h-[500px] overflow-auto">

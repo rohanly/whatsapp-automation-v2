@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "09a38de5-38b3-4c4a-b926-47e1fec33fe4",
+  "id": "7d019856-2df8-4d51-b1e8-73381ac9c23a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "event_types": {
@@ -145,7 +145,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "events_type_event_types_id_fk": {
@@ -345,7 +345,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "people_relations_relation_relation_types_id_fk": {

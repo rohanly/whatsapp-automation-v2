@@ -24,7 +24,6 @@ import {
 import { Textarea } from "./ui/textarea";
 import { formatDate } from "@/utils/date";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { pb } from "@/lib/pocketbase";
 import { useState } from "react";
 import {
   Select,
@@ -33,6 +32,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { convertToFormData } from "@/utils";
+import { createPeople, createPeopleRelation } from "@/api/people.service";
 
 export function AddPeople() {
   const [open, setOpen] = useState(false);
@@ -52,21 +53,25 @@ export function AddPeople() {
   const mutation = useMutation({
     mutationKey: ["people"],
     mutationFn: async (data: FormFields) => {
-      const formData = new FormData();
+      const { relation, dateOfBirth, image, ...rest } = data;
+      const formData = convertToFormData({
+        ...rest,
+        dateOfBirth: dateOfBirth?.toISOString(),
+        image: image?.[0],
+      });
 
-      formData.append("image", data["image"][0]);
-      const record = await pb.collection("people").create(data);
+      const person = await createPeople(formData);
 
-      const eventData = {
-        name: "Birthday",
-        // type: "gql6ruo847yyphd",
-        type: "zyksbmdhsqkz5as",
-        date: record.date,
-        person: record.id,
-      };
+      if (relation.length) {
+        for (let relationId of relation) {
+          await createPeopleRelation({
+            personId: person?.id,
+            relationTypeId: relationId,
+          });
+        }
+      }
 
-      const resp = await pb.collection("events").create(eventData);
-      return pb.collection("people").update(record.id, formData);
+      return person;
     },
     onSuccess: (resp) => {
       console.log(resp);
@@ -116,11 +121,11 @@ export function AddPeople() {
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="date_of_birth" className="text-left">
+            <Label htmlFor="dateOfBirth" className="text-left">
               Date of Birth
             </Label>
             <Controller
-              name="date_of_birth"
+              name="dateOfBirth"
               control={control}
               render={({ field }) => (
                 <div className="col-span-4 ">
@@ -165,6 +170,7 @@ export function AddPeople() {
             <Input
               id="picture"
               type="file"
+              multiple={false}
               {...register("image")}
               accept="image/png, image/jpeg"
               className="col-span-4 "
@@ -235,14 +241,14 @@ export function AddPeople() {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="social_link" className="text-left">
+            <Label htmlFor="socialLink" className="text-left">
               Social link
             </Label>
             <Input
-              id="social_link"
+              id="socialLink"
               className="col-span-4 "
-              {...register("social_link")}
-              error={errors?.social_link?.message}
+              {...register("socialLink")}
+              error={errors?.socialLink?.message}
             />
           </div>
 
@@ -259,13 +265,13 @@ export function AddPeople() {
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-left">
+            <Label htmlFor="additionalInfo" className="text-left">
               Additional Info
             </Label>
             <Textarea
               className="col-span-4"
               placeholder="Type your message here."
-              {...register("additional_info")}
+              {...register("additionalInfo")}
             />
           </div>
         </div>

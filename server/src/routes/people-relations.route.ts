@@ -112,3 +112,21 @@ peopleRelationsRouter.delete("/:id", async (c) => {
     return c.json({ message: "Failed to retrieve person", error }, 500);
   }
 });
+
+peopleRelationsRouter.delete("/person/:id", async (c) => {
+  const id = c.req.param("id");
+  try {
+    const person = await db
+      .delete(peopleRelationsTable)
+      .where(eq(peopleRelationsTable.personId, id))
+      .returning();
+
+    if (person) {
+      return c.json(person);
+    } else {
+      return c.json({ message: "Person not found" }, 404);
+    }
+  } catch (error) {
+    return c.json({ message: "Failed to retrieve person", error }, 500);
+  }
+});

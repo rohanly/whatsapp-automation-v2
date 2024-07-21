@@ -15,7 +15,7 @@ peopleRouter.post("/", storage.single("image"), async (c) => {
 
     const person = await db.insert(peopleTable).values(body).returning();
 
-    return c.json({ data: person });
+    return c.json(person[0]);
   } catch (error) {
     return c.json({ message: "Person creation failed", error }, 500);
   }
@@ -77,18 +77,20 @@ peopleRouter.get("/:id", async (c) => {
     }
 
     // Return response
-    return c.json({
-      data: person,
-    });
+    return c.json(person);
   } catch (error) {
     console.error("Failed to retrieve person", error);
     return c.json({ message: "Failed to retrieve person", error }, 500);
   }
 });
 
-peopleRouter.patch("/:id", async (c) => {
+peopleRouter.patch("/:id", storage.single("image"), async (c) => {
   const id = c.req.param("id");
-  const body = await c.req.json();
+  const body: any = await c.req.parseBody();
+  if (c.var.imageUrl) {
+    body.image = (c.var as any).imageUrl;
+  }
+
   try {
     const person = await db
       .update(peopleTable)
@@ -120,6 +122,7 @@ peopleRouter.delete("/:id", async (c) => {
       return c.json({ message: "Person not found" }, 404);
     }
   } catch (error) {
+    console.log("ERROR: ", error);
     return c.json({ message: "Failed to retrieve person", error }, 500);
   }
 });

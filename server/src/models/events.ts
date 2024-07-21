@@ -11,7 +11,9 @@ export const eventsTable = sqliteTable("events", {
     .$default(() => v4()),
   name: text("name"),
   date: text("date"),
-  personId: text("person").references(() => peopleTable.id),
+  personId: text("person").references(() => peopleTable.id, {
+    onDelete: "cascade",
+  }),
   everyYear: integer("every_year", { mode: "boolean" }),
   eventTypeId: text("type").references(() => eventTypesTable.id),
   messageCount: integer("message_count"),

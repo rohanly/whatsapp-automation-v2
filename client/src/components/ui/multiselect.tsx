@@ -6,45 +6,32 @@ import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
 import { CommandEmpty, CommandList, Command as CommandPrimitive } from "cmdk";
 import { pb } from "@/lib/pocketbase";
 import { useQuery } from "@tanstack/react-query";
-
-type OptionType = Record<"value" | "label", string>;
+import { getRelationTypeList } from "@/api/relation-types.service";
 
 export function MultiSelect({
   selected,
   setSelected,
 }: {
-  selected: string[];
+  selected: any[];
   setSelected: (...event: any[]) => void;
 }) {
+  console.log("SELECTED: ", selected);
+
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState("");
-  // const [options, setOptions] = React.useState<OptionType[]>([]);
 
   const handleUnselect = React.useCallback(
-    (framework: OptionType) => {
-      setSelected(selected.filter((s: any) => s.value !== framework.value));
+    (framework) => {
+      setSelected(selected.filter((s: any) => s.id !== framework.id));
     },
     [selected]
   );
 
   const { data: options, isLoading } = useQuery({
-    queryKey: ["relation"],
-    queryFn: () => pb.collection("relations").getFullList(),
+    queryKey: ["getRelationTypeList"],
+    queryFn: getRelationTypeList,
   });
-
-  const handleCreateOption = async () => {
-    try {
-      const record = await pb.collection("relations").create({
-        label: inputValue,
-        value: inputValue.toLowerCase().replace(/ /g, "_"),
-      });
-      console.log(record);
-      setInputValue("");
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -67,7 +54,7 @@ export function MultiSelect({
   );
 
   const selectables = options?.filter(
-    (framework: any) => !selected.includes(framework)
+    (option: any) => !selected?.includes(option)
   );
 
   if (isLoading) return <div>loading...</div>;
@@ -79,22 +66,22 @@ export function MultiSelect({
     >
       <div className="group border border-input px-3 py-2 text-sm ring-offset-background rounded-md focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
         <div className="flex gap-1 flex-wrap">
-          {selected?.map((framework: any) => {
+          {selected?.map((option: any) => {
             return (
-              <Badge key={framework.value} variant="secondary">
-                {framework.label}
+              <Badge key={option.id} variant="secondary">
+                {option.name}
                 <button
                   className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
-                      handleUnselect(framework);
+                      handleUnselect(option);
                     }
                   }}
                   onMouseDown={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                   }}
-                  onClick={() => handleUnselect(framework)}
+                  onClick={() => handleUnselect(option)}
                 >
                   <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
                 </button>
@@ -131,22 +118,22 @@ export function MultiSelect({
               </CommandEmpty>
 
               <CommandGroup className="h-full overflow-auto z-20 cursor-help">
-                {selectables?.map((framework) => {
+                {selectables?.map((option) => {
                   return (
                     <CommandItem
-                      key={framework.value}
+                      key={option.id}
                       onMouseDown={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                       }}
                       onSelect={(value) => {
                         setInputValue("");
-                        setSelected([...selected, framework]);
+                        setSelected([...new Set([...selected, option])]);
                       }}
                       className={"cursor-pointer"}
                       data-disabled={"false"}
                     >
-                      {framework.label}
+                      {option.name}
                     </CommandItem>
                   );
                 })}

@@ -11,17 +11,11 @@ export const messagesTable = sqliteTable("messages", {
     .$default(() => v4()),
 
   image: text("image"),
-
   message: text("message"),
-
   eventTypeId: text("event_type").references(() => eventTypesTable.id), // Relation to `eventTypesTable`
-
   sent: integer("sent", { mode: "boolean" }),
-
   templateId: text("template").references(() => templatesTable.id), // Relation to `templatesTable`
-
   receiptId: text("receipt").references(() => peopleTable.id), // Relation to `receiptsTable`
-
   createdAt: text("created_at")
     .notNull()
     .default(sql`(current_timestamp)`),
