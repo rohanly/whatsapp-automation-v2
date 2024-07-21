@@ -95,13 +95,15 @@ export const columns: ColumnDef<Event>[] = [
       );
     },
     cell: ({ row }) => {
-      const events = row.getValue("events");
-      return <div className="lowercase">{formatDate(events?.date)}</div>;
+      return (
+        <div className="lowercase">{formatDate(row.getValue("date"))}</div>
+      );
     },
   },
 
   {
     id: "actions",
+    header: "Actions",
     enableHiding: false,
     cell: ({ row }) => {
       return (

@@ -1,6 +1,7 @@
 import DashboardEventList from "@/components/DashboardEventList";
 import DashboardLayout from "@/components/DashboardLayout";
 import DashboardMessageList from "@/components/DashboardMessageList";
+import Meteors from "@/components/ui/meteors";
 
 export default function DashboardPage() {
   return (

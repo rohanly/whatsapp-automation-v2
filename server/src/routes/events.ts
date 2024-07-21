@@ -20,45 +20,39 @@ eventsRouter.post("/", async (c) => {
   }
 });
 
-eventsRouter.get(
-  "/",
-  zValidator(
-    "query",
-    z.object({
-      page: z.coerce.number().nonnegative().optional().default(0),
-      limit: z.coerce.number().nonnegative().optional().default(10),
-    })
-  ),
-  async (c) => {
-    const { limit, page } = c.req.valid("query");
+eventsRouter.get("/", async (c) => {
+  let { page, pageSize, date } = c.req.query() as any;
 
-    try {
-      // Retrieve paginated people data with relations
-      const people: any = await db.query.eventsTable.findMany({
-        with: {
-          person: {
-            with: {
-              relations: {
-                with: {
-                  relationType: true,
-                },
+  page = parseInt(page) || 1;
+  pageSize = parseInt(pageSize) || 10;
+
+  try {
+    // Retrieve paginated people data with relations
+    const people: any = await db.query.eventsTable.findMany({
+      with: {
+        person: {
+          with: {
+            relations: {
+              with: {
+                relationType: true,
               },
             },
           },
-          eventType: true,
         },
-        limit: limit,
-        offset: page * limit,
-      });
+        eventType: true,
+      },
+      where: date ? eq(eventsTable.date, date) : undefined,
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
+    });
 
-      // Return response without additional nesting
-      return c.json({ data: people, pagination: { page, limit } });
-    } catch (error) {
-      console.log("ERROR: ", error);
-      return c.json({ message: "Failed to retrieve people", error }, 500);
-    }
+    // Return response without additional nesting
+    return c.json({ data: people, pagination: { page, pageSize } });
+  } catch (error) {
+    console.log("ERROR: ", error);
+    return c.json({ message: "Failed to retrieve people", error }, 500);
   }
-);
+});
 
 eventsRouter.get("/:id", async (c) => {
   const id = c.req.param("id");

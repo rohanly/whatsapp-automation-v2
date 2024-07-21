@@ -14,7 +14,6 @@ import {
   Users,
 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -37,6 +36,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { logout } from "@/services/auth-service";
 import Logo from "./Logo";
+import RetroGrid from "./ui/retro-grid";
 
 const navLinks = [
   {
@@ -214,10 +214,11 @@ export default function DashboardLayout({
         )}
         <main
           className={cn(
-            "flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 h-full overflow-auto",
+            "relative flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 h-full overflow-auto",
             className
           )}
         >
+          <RetroGrid className="h-[100px] w-[90%] -z-10" />
           {children}
         </main>
       </div>

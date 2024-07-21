@@ -1,22 +1,22 @@
 import { Hono } from "hono";
 import { db } from "~/db";
-import { eq, relations } from "drizzle-orm";
-import { peopleTable, SelectPeople } from "~/models/people";
+import { eq } from "drizzle-orm";
+import { peopleTable } from "~/models/people";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { relationTypesTable } from "../models/relation-types";
+import { storage } from "~/storage";
 
 export const peopleRouter = new Hono();
 
-peopleRouter.post("/", async (c) => {
+peopleRouter.post("/", storage.single("image"), async (c) => {
   try {
-    const data = await c.req.json();
+    const body: any = await c.req.parseBody();
+    body.image = (c.var as any).imageUrl;
 
-    const person = await db.insert(peopleTable).values(data).returning();
+    const person = await db.insert(peopleTable).values(body).returning();
 
     return c.json({ data: person });
   } catch (error) {
-    console.log("ERROR : ", error);
     return c.json({ message: "Person creation failed", error }, 500);
   }
 });
@@ -26,7 +26,7 @@ peopleRouter.get(
   zValidator(
     "query",
     z.object({
-      page: z.coerce.number().nonnegative().optional().default(0),
+      page: z.coerce.number().nonnegative().optional().default(1),
       limit: z.coerce.number().nonnegative().optional().default(10),
     })
   ),
@@ -44,7 +44,7 @@ peopleRouter.get(
           },
         },
         limit: limit,
-        offset: page * limit,
+        offset: (page - 1) * limit,
       });
 
       // Return response without additional nesting

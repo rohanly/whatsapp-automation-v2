@@ -5,6 +5,7 @@ import { poweredBy } from "hono/powered-by";
 import { jwt } from "hono/jwt";
 import { swaggerUI } from "@hono/swagger-ui";
 import { router } from "./routes";
+import { serveStatic } from "@hono/node-server/serve-static";
 
 const app = new Hono();
 
@@ -18,17 +19,11 @@ app.use(logger());
 app.get("/_swagger", swaggerUI({ url: "/docs" }));
 
 app.use(
-  "/auth/*",
-  jwt({
-    secret: "it-is-very-secret",
+  "/*",
+  serveStatic({
+    root: "./public",
   })
 );
-
-// storage
-app.use("/uploads/*", async (c, next) => {
-  await next();
-  c.header("Content-Type", "image/jpeg");
-});
 
 app.route("/api", router);
 

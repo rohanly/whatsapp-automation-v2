@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "./ui/textarea";
 import { formatDate, toDate } from "@/utils/date";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { pb } from "@/lib/pocketbase";
 import { useState } from "react";
 import { eventFormSchema, FormFields } from "@/schemas/event";
@@ -42,6 +42,8 @@ import { getTemplateList } from "@/api/templates.service";
 export function AddEvent() {
   const [open, setOpen] = useState(false);
 
+  const queryClient = useQueryClient();
+
   const {
     handleSubmit,
     formState: { errors },
@@ -58,6 +60,10 @@ export function AddEvent() {
     mutationFn: (data: FormFields) => createEvent(data),
     onSuccess: (resp) => {
       console.log(resp);
+      queryClient.invalidateQueries({
+        queryKey: ["getEventList"],
+      });
+
       reset();
       setOpen(false);
     },
