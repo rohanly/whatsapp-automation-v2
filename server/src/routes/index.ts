@@ -5,9 +5,11 @@ import { peopleRouter } from "./people.route";
 import { peopleRelationsRouter } from "./people-relations.route";
 import { eventsRouter } from "./events";
 import { eventTypesRouter } from "./events-types";
+import { sessionRouter } from "./session.route";
 
 export const router = new Hono();
 
+router.route("/sessions", sessionRouter);
 router.route("/users", userRouter);
 router.route("/relation_types", relationRouter);
 router.route("/people", peopleRouter);
