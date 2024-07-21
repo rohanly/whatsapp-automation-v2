@@ -8,6 +8,19 @@ import { relationTypesTable } from "../models/relation-types";
 
 export const peopleRouter = new Hono();
 
+peopleRouter.post("/", async (c) => {
+  try {
+    const data = await c.req.json();
+
+    const person = await db.insert(peopleTable).values(data).returning();
+
+    return c.json({ data: person });
+  } catch (error) {
+    console.log("ERROR : ", error);
+    return c.json({ message: "Person creation failed", error }, 500);
+  }
+});
+
 peopleRouter.get(
   "/",
   zValidator(
@@ -22,12 +35,16 @@ peopleRouter.get(
 
     try {
       // Retrieve paginated people data with relations
-      const people: any = await db.query.people.findMany({
+      const people: any = await db.query.peopleTable.findMany({
         with: {
-          relations: true,
+          relations: {
+            with: {
+              relationType: true,
+            },
+          },
         },
         limit: limit,
-        offset: page,
+        offset: page * limit,
       });
 
       // Return response without additional nesting
@@ -44,10 +61,14 @@ peopleRouter.get("/:id", async (c) => {
 
   try {
     // Retrieve person
-    const person = await db.query.people.findFirst({
+    const person = await db.query.peopleTable.findFirst({
       where: eq(peopleTable.id, id),
       with: {
-        relationType: true,
+        relations: {
+          with: {
+            relationType: true,
+          },
+        },
       },
     });
 
@@ -65,18 +86,6 @@ peopleRouter.get("/:id", async (c) => {
   }
 });
 
-peopleRouter.post("/", async (c) => {
-  try {
-    const data = await c.req.json();
-
-    const person = await db.insert(peopleTable).values(data).returning();
-
-    return c.json({ data: person });
-  } catch (error) {
-    return c.json({ message: "Person creation failed", error }, 500);
-  }
-});
-
 peopleRouter.patch("/:id", async (c) => {
   const id = c.req.param("id");
   const body = await c.req.json();
@@ -84,6 +93,24 @@ peopleRouter.patch("/:id", async (c) => {
     const person = await db
       .update(peopleTable)
       .set(body)
+      .where(eq(peopleTable.id, id))
+      .returning();
+
+    if (person) {
+      return c.json(person);
+    } else {
+      return c.json({ message: "Person not found" }, 404);
+    }
+  } catch (error) {
+    return c.json({ message: "Failed to retrieve person", error }, 500);
+  }
+});
+
+peopleRouter.delete("/:id", async (c) => {
+  const id = c.req.param("id");
+  try {
+    const person = await db
+      .delete(peopleTable)
       .where(eq(peopleTable.id, id))
       .returning();
 

@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { v4 } from "uuid";
 import { peopleTable } from "./people";
@@ -27,5 +27,14 @@ export const eventsTable = sqliteTable("events", {
     .$onUpdate(() => sql`(current_timestamp)`),
 });
 
-export type InsertEvent = typeof eventsTable.$inferInsert;
-export type SelectEvent = typeof eventsTable.$inferSelect;
+export const eventRelations = relations(eventsTable, ({ one }) => ({
+  person: one(peopleTable, {
+    fields: [eventsTable.personId],
+    references: [peopleTable.id],
+  }),
+
+  eventType: one(eventTypesTable, {
+    fields: [eventsTable.eventTypeId],
+    references: [eventTypesTable.id],
+  }),
+}));

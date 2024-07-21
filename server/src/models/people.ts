@@ -1,7 +1,7 @@
 import { relations, sql } from "drizzle-orm";
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { v4 } from "uuid";
-import { relationTypesTable } from "./relation-types";
+import { peopleRelationsTable } from "./people-relations";
 
 export const peopleTable = sqliteTable("people", {
   id: text("id")
@@ -29,8 +29,8 @@ export const peopleTable = sqliteTable("people", {
     .$onUpdate(() => sql`(current_timestamp)`),
 });
 
-export const peopleRelations = relations(peopleTable, ({ many }) => ({
-  relations: many(relationTypesTable),
+export const peopleToRelations = relations(peopleTable, ({ many }) => ({
+  relations: many(peopleRelationsTable),
 }));
 
 export type InsertPeople = typeof peopleTable.$inferInsert;

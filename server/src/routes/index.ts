@@ -1,21 +1,16 @@
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import { z } from "zod";
+import { userRouter } from "./users";
+import { relationRouter } from "./relation-types";
+import { peopleRouter } from "./people.route";
+import { peopleRelationsRouter } from "./people-relations.route";
+import { eventsRouter } from "./events";
+import { eventTypesRouter } from "./events-types";
 
-export const authRouter = new Hono();
+export const router = new Hono();
 
-authRouter.get(
-  "/hello",
-  zValidator(
-    "query",
-    z.object({
-      name: z.string().optional(),
-    })
-  ),
-  async (ctx) => {
-    const query = ctx.req.valid("query");
-    return ctx.json({
-      message: `Hello ${query.name || "World"}`,
-    });
-  }
-);
+router.route("/users", userRouter);
+router.route("/relation_types", relationRouter);
+router.route("/people", peopleRouter);
+router.route("/people_relations", peopleRelationsRouter);
+router.route("/events", eventsRouter);
+router.route("/event_types", eventTypesRouter.getRouter());

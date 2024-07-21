@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "90c0a429-d304-401e-8168-52f0ecc6bd2f",
+  "id": "09a38de5-38b3-4c4a-b926-47e1fec33fe4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "event_types": {
@@ -292,6 +292,79 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
+    "people_relations": {
+      "name": "people_relations",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "person": {
+          "name": "person",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "relation": {
+          "name": "relation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(current_timestamp)"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(current_timestamp)"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "people_relations_person_people_id_fk": {
+          "name": "people_relations_person_people_id_fk",
+          "tableFrom": "people_relations",
+          "tableTo": "people",
+          "columnsFrom": [
+            "person"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "people_relations_relation_relation_types_id_fk": {
+          "name": "people_relations_relation_relation_types_id_fk",
+          "tableFrom": "people_relations",
+          "tableTo": "relation_types",
+          "columnsFrom": [
+            "relation"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "people": {
       "name": "people",
       "columns": {
@@ -432,13 +505,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "person": {
-          "name": "person",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "chapter": {
           "name": "chapter",
           "type": "text",
@@ -464,21 +530,7 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "relation_types_person_people_id_fk": {
-          "name": "relation_types_person_people_id_fk",
-          "tableFrom": "relation_types",
-          "tableTo": "people",
-          "columnsFrom": [
-            "person"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },

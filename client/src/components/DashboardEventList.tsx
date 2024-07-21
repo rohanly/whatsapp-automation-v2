@@ -65,13 +65,8 @@ export default function DashboardEventList() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {events?.data?.map((eventData: any, i) => (
-              <EventTableRow
-                key={i}
-                event={eventData?.events}
-                eventType={eventData?.event_types}
-                person={eventData?.people}
-              />
+            {events?.data?.map((event) => (
+              <EventTableRow key={event.id} event={event} />
             ))}
           </TableBody>
         </Table>
@@ -85,7 +80,7 @@ export default function DashboardEventList() {
   );
 }
 
-export const EventTableRow = ({ event, eventType, person }: any) => {
+export const EventTableRow = ({ event }: any) => {
   const navigate = useNavigate();
 
   const mutation = useMutation({
@@ -108,22 +103,22 @@ export const EventTableRow = ({ event, eventType, person }: any) => {
   });
   return (
     <TableRow key={event.id}>
-      <TableCell className="font-medium">{person?.name}</TableCell>
+      <TableCell className="font-medium">{event?.person?.name}</TableCell>
 
       <TableCell className="hidden md:table-cell">
-        <Badge variant="outline">{eventType?.name}</Badge>
+        <Badge variant="outline">{event?.eventType?.name}</Badge>
       </TableCell>
       {/* TODO: Add people relations */}
       <TableCell>
-        {person?.expand?.relation?.map((relation: Relation) => (
+        {event?.person?.relations?.map((relation: any) => (
           <Badge key={relation.id} variant="outline">
-            {relation.label}
+            {relation?.relationType?.name}
           </Badge>
         ))}
       </TableCell>
 
       <TableCell className="hidden md:table-cell">
-        {formatDate(event.date)}
+        {formatDate(event?.date)}
       </TableCell>
       <TableCell>
         {/* <DropdownMenu>

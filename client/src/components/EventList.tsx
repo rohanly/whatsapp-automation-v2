@@ -43,42 +43,42 @@ import { getEventList } from "@/api/events.service";
 
 export const columns: ColumnDef<Event>[] = [
   {
-    accessorKey: "people",
+    accessorKey: "person",
     header: "Name",
 
     cell: ({ row }) => {
-      const people: any = row.getValue("people");
+      const people: any = row.getValue("person");
       return <div className="flex gap-1">{people?.name}</div>;
     },
   },
 
   {
-    accessorKey: "events",
+    accessorKey: "eventType",
     header: "Event",
     cell: ({ row }) => {
-      const event: any = row.getValue("events");
+      const eventType: any = row.getValue("eventType");
 
-      return <div className="capitalize font-medium">{event?.name}</div>;
+      return <div className="capitalize font-medium">{eventType?.name}</div>;
     },
   },
 
-  // {
-  //   accessorKey: "relation",
-  //   header: () => <div className="text-left">Relation(s)</div>,
-  //   cell: ({ row }) => {
-  //     const { person }: any = row.getValue("expand");
+  {
+    accessorKey: "person.relation",
+    header: () => <div className="text-left">Relation(s)</div>,
+    cell: ({ row }) => {
+      const person: any = row.getValue("person");
 
-  //     return (
-  //       <div className="flex gap-1">
-  //         {person?.expand?.relation.map((item, index) => (
-  //           <Badge variant="outline" key={index}>
-  //             {item.label}
-  //           </Badge>
-  //         ))}
-  //       </div>
-  //     );
-  //   },
-  // },
+      return (
+        <div className="flex gap-1">
+          {person?.relations?.map((relation: any) => (
+            <Badge variant="outline" key={relation?.id}>
+              {relation?.relationType?.name}
+            </Badge>
+          ))}
+        </div>
+      );
+    },
+  },
 
   {
     accessorKey: "date",

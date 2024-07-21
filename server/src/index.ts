@@ -4,13 +4,7 @@ import { logger } from "hono/logger";
 import { poweredBy } from "hono/powered-by";
 import { jwt } from "hono/jwt";
 import { swaggerUI } from "@hono/swagger-ui";
-
-import { userRouter } from "./routes/users";
-import { relationRouter } from "./routes/relations";
-import { peopleRouter } from "./routes/people";
-import { eventTypesRouter } from "./routes/events-types";
-import { eventsRouter } from "./routes/events";
-import { authRouter } from "./routes";
+import { router } from "./routes";
 
 const app = new Hono();
 
@@ -36,20 +30,7 @@ app.use("/uploads/*", async (c, next) => {
   c.header("Content-Type", "image/jpeg");
 });
 
-app.get("/hello", (c) => {
-  return c.json({
-    message: "Hello from Hono!",
-  });
-});
-
-const apiRouter = app.basePath("/api");
-
-apiRouter.route("/auth", authRouter);
-apiRouter.route("/users", userRouter);
-apiRouter.route("/relations", relationRouter);
-apiRouter.route("/people", peopleRouter);
-apiRouter.route("/events", eventsRouter.getRouter());
-apiRouter.route("/event_types", eventTypesRouter.getRouter());
+app.route("/api", router);
 
 const port = 3000;
 console.log(`Server is running on port ${port}`);

@@ -38,6 +38,16 @@ CREATE TABLE `messages` (
 	FOREIGN KEY (`receipt`) REFERENCES `people`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
+CREATE TABLE `people_relations` (
+	`id` text PRIMARY KEY NOT NULL,
+	`person` text,
+	`relation` text,
+	`created_at` text DEFAULT (current_timestamp) NOT NULL,
+	`updated_at` text DEFAULT (current_timestamp) NOT NULL,
+	FOREIGN KEY (`person`) REFERENCES `people`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`relation`) REFERENCES `relation_types`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
 CREATE TABLE `people` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
@@ -60,11 +70,9 @@ CREATE TABLE `people` (
 CREATE TABLE `relation_types` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
-	`person` text,
 	`chapter` text,
 	`created_at` text DEFAULT (current_timestamp) NOT NULL,
-	`updated_at` text DEFAULT (current_timestamp) NOT NULL,
-	FOREIGN KEY (`person`) REFERENCES `people`(`id`) ON UPDATE no action ON DELETE no action
+	`updated_at` text DEFAULT (current_timestamp) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `templates` (
