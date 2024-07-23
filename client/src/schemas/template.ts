@@ -10,7 +10,7 @@ const ACCEPTED_IMAGE_TYPES = [
 export const templateSchema = z.object({
   image: z.any(),
   message: z.string().optional(),
-  type: z.string(),
+  eventTypeId: z.string(),
 });
 
 export type TemplateSchema = z.infer<typeof templateSchema>;

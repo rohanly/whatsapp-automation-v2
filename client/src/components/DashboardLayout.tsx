@@ -104,7 +104,7 @@ export default function DashboardLayout({
                   key={index}
                   to={item.link}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                    "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-black/90",
                     "/" + location.pathname.split("/")[1] == item.link &&
                       "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground/90"
                   )}
@@ -218,7 +218,7 @@ export default function DashboardLayout({
             className
           )}
         >
-          {showHeader && <RetroGrid className="h-[100px] w-[90%] -z-10" />}
+          {/* {showHeader && <RetroGrid className="h-[100px] w-[90%] -z-10" />} */}
           {children}
         </main>
       </div>

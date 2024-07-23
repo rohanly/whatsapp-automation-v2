@@ -1,5 +1,5 @@
 import { pb } from "@/lib/pocketbase";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { NoTemplates } from "./NoTemplates";
@@ -26,41 +26,41 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { deleteTemplate, getTemplateList } from "@/api/templates.service";
 
 function TemplateList() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["getTemplates"],
-    queryFn: () => {
-      return pb.collection("templates").getFullList({
-        sort: "-created",
-        expand: "type",
-      });
-    },
+  const { data: templates, isLoading } = useQuery({
+    queryKey: ["getTemplateList"],
+    queryFn: getTemplateList,
   });
 
-  // if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <p>Loading...</p>;
 
-  return data?.length ? (
+  if (templates?.data?.length === 0) return <NoTemplates />;
+
+  return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {data?.map((item) => (
-        <TemplateItem key={item.id} data={item} />
+      {templates?.data?.map((template) => (
+        <TemplateItem key={template.id} template={template} />
       ))}
     </div>
-  ) : (
-    <NoTemplates />
   );
 }
 
 export default TemplateList;
 
-const TemplateItem = ({ data }: any) => {
+const TemplateItem = ({ template }: any) => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
   const [showDialog, setShowDialog] = useState(false);
 
   const mutation = useMutation({
-    mutationKey: ["getTemplates"],
-    mutationFn: () => {
-      return pb.collection("templates").delete(data.id);
+    mutationFn: () => deleteTemplate(template.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getTemplateList"],
+      });
     },
   });
 
@@ -69,7 +69,7 @@ const TemplateItem = ({ data }: any) => {
       <Card className="group">
         <CardHeader>
           <CardTitle className="flex justify-between items-center">
-            <Badge>{data.expand?.type.name}</Badge>
+            <Badge>{template.eventType?.name}</Badge>
 
             <div>
               <DropdownMenu>
@@ -82,7 +82,7 @@ const TemplateItem = ({ data }: any) => {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
                   <DropdownMenuItem
-                    onClick={() => navigate("/templates/" + data.id)}
+                    onClick={() => navigate("/templates/" + template.id)}
                   >
                     Edit
                   </DropdownMenuItem>
@@ -106,13 +106,10 @@ const TemplateItem = ({ data }: any) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-4">
-          <img
-            className="w-full h-[250px] object-cover"
-            src={getImageURL(data, data.image)}
-          />
+          <img className="w-full h-[250px] object-cover" src={template.image} />
           <p
             dangerouslySetInnerHTML={{
-              __html: data?.message,
+              __html: template?.message,
             }}
           ></p>
         </CardContent>

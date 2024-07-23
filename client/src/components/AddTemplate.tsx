@@ -20,6 +20,13 @@ import { useEffect, useState } from "react";
 
 import { useToast } from "./ui/use-toast";
 import { TemplateSchema, templateSchema } from "@/schemas/template";
+import {
+  createTemplate,
+  editTemplate,
+  getTemplateById,
+} from "@/api/templates.service";
+import { getEventList, getEventTypeList } from "@/api/events.service";
+import { convertToFormData } from "@/utils";
 
 export function AddTemplate({ id }: { id?: string }) {
   const { toast } = useToast();
@@ -39,45 +46,23 @@ export function AddTemplate({ id }: { id?: string }) {
 
   const { data: template, refetch: refetchTemplate } = useQuery({
     queryKey: ["getTemplateById", id],
-    queryFn: () => {
-      if (!id || id === "new") return null;
-      return pb.collection("templates").getOne(id, {
-        expand: "type",
-      });
-    },
+    queryFn: () => getTemplateById(id),
   });
 
   const { data: eventTypes, isLoading } = useQuery({
-    queryKey: ["getEventTypes"],
-    queryFn: () => pb.collection("event_types").getFullList(),
+    queryKey: ["getEventTypeList"],
+    queryFn: getEventTypeList,
   });
-
-  useEffect(() => {
-    if (!template) return;
-    (async () => {
-      setValue("type", template.expand?.type.id);
-      setValue("message", template.message);
-
-      const url = pb.files.getUrl(template, template.image);
-      setValue("image", url);
-    })();
-  }, [template]);
 
   const mutation = useMutation({
     mutationKey: ["people"],
     mutationFn: (data: TemplateSchema) => {
-      const formData = new FormData();
-      for (const key in data) {
-        if (key == "image") {
-          if (typeof data.image !== "string") formData.append(key, data[key]);
-        } else {
-          formData.append(key, data[key]);
-        }
-      }
+      const formData = convertToFormData(data);
+
       if (!id || id == "new") {
-        return pb.collection("templates").create(formData);
+        return createTemplate(formData);
       }
-      return pb.collection("templates").update(id, formData);
+      return editTemplate(id, formData);
     },
     onSuccess: (resp) => {
       console.log(resp);
@@ -89,6 +74,16 @@ export function AddTemplate({ id }: { id?: string }) {
     },
     onError: (err) => console.log(err),
   });
+
+  useEffect(() => {
+    if (!template) return;
+
+    reset({
+      eventTypeId: template?.eventType?.id,
+      message: template?.message,
+      image: template?.image,
+    });
+  }, [template]);
 
   const onSubmit: SubmitHandler<TemplateSchema> = (data) => {
     mutation.mutate(data);
@@ -124,9 +119,7 @@ export function AddTemplate({ id }: { id?: string }) {
                   <div className="col-span-4 flex justify-start items-center">
                     <div className="relative">
                       <img
-                        src={
-                          isValidHttpUrl(field.value) ? field.value : preview
-                        }
+                        src={preview ? preview : field.value}
                         className=" w-[180px] rounded-lg object-contain"
                       />
                       <div
@@ -159,11 +152,11 @@ export function AddTemplate({ id }: { id?: string }) {
           </div>
 
           <div className="grid w-full items-center gap-1.5">
-            <Label htmlFor="type" className="text-left">
-              Type
+            <Label htmlFor="eventTypeId" className="text-left">
+              Event type
             </Label>
             <Controller
-              name="type"
+              name="eventTypeId"
               control={control}
               render={({ field }) => (
                 <div className="flex flex-col gap-1">
@@ -175,24 +168,25 @@ export function AddTemplate({ id }: { id?: string }) {
                       <SelectValue
                         placeholder={
                           field.value
-                            ? eventTypes?.find((ev) => ev.id == field.value)
-                                ?.name
+                            ? eventTypes?.data?.find(
+                                (ev) => ev.id == field.value
+                              )?.name
                             : "Select type"
                         }
                         defaultValue={field.value}
                       />
                     </SelectTrigger>
                     <SelectContent>
-                      {eventTypes?.map((eventType) => (
+                      {eventTypes?.data?.map((eventType) => (
                         <SelectItem value={eventType.id}>
                           {eventType.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  {errors.type?.message && (
+                  {errors.eventTypeId?.message && (
                     <p className="text-xs text-red-500 col-span-4">
-                      {errors.type?.message}
+                      {errors.eventTypeId?.message}
                     </p>
                   )}
                 </div>
@@ -228,15 +222,3 @@ export function AddTemplate({ id }: { id?: string }) {
     </div>
   );
 }
-
-const isValidHttpUrl = (str: string) => {
-  let url;
-
-  try {
-    url = new URL(str);
-  } catch (_) {
-    return false;
-  }
-
-  return url.protocol === "http:" || url.protocol === "https:";
-};

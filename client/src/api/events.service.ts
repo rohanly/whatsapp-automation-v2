@@ -1,20 +1,12 @@
 import API from ".";
 
-export const getEventList = async (populate: string = "*") => {
-  const res = await API.get("/api/events", {
-    params: {
-      populate,
-    },
-  });
+export const getEventList = async () => {
+  const res = await API.get("/api/events");
   return res.data;
 };
 
-export const getEventTypeList = async (populate: string = "*") => {
-  const res = await API.get("/api/event_types", {
-    params: {
-      populate,
-    },
-  });
+export const getEventTypeList = async () => {
+  const res = await API.get("/api/event_types");
   return res.data;
 };
 

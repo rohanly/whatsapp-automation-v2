@@ -1,9 +1,9 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { v4 } from "uuid";
-import { eventTypesTable } from "./event-types";
 import { templatesTable } from "./templates";
 import { peopleTable } from "./people";
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
+import { eventsTable } from "./events";
 
 export const messagesTable = sqliteTable("messages", {
   id: text("id")
@@ -12,10 +12,10 @@ export const messagesTable = sqliteTable("messages", {
 
   image: text("image"),
   message: text("message"),
-  eventTypeId: text("event_type").references(() => eventTypesTable.id), // Relation to `eventTypesTable`
+  eventId: text("eventId").references(() => eventsTable.id),
   sent: integer("sent", { mode: "boolean" }),
-  templateId: text("template").references(() => templatesTable.id), // Relation to `templatesTable`
-  receiptId: text("receipt").references(() => peopleTable.id), // Relation to `receiptsTable`
+  templateId: text("template").references(() => templatesTable.id),
+  receiptId: text("receipt").references(() => peopleTable.id),
   createdAt: text("created_at")
     .notNull()
     .default(sql`(current_timestamp)`),
@@ -24,3 +24,20 @@ export const messagesTable = sqliteTable("messages", {
     .default(sql`(current_timestamp)`)
     .$onUpdate(() => sql`(current_timestamp)`),
 });
+
+export const messageRelations = relations(messagesTable, ({ one }) => ({
+  receipt: one(peopleTable, {
+    fields: [messagesTable.receiptId],
+    references: [peopleTable.id],
+  }),
+
+  event: one(eventsTable, {
+    fields: [messagesTable.eventId],
+    references: [eventsTable.id],
+  }),
+
+  template: one(templatesTable, {
+    fields: [messagesTable.templateId],
+    references: [templatesTable.id],
+  }),
+}));

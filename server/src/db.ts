@@ -5,8 +5,8 @@ import { peopleTable, peopleToRelations } from "./models/people";
 import { relationTypesTable } from "./models/relation-types";
 import { eventRelations, eventsTable } from "./models/events";
 import { eventTypesTable } from "./models/event-types";
-import { templatesTable } from "./models/templates";
-import { messagesTable } from "./models/messages";
+import { templateRelations, templatesTable } from "./models/templates";
+import { messageRelations, messagesTable } from "./models/messages";
 import {
   peopleRelations,
   peopleRelationsTable,
@@ -27,6 +27,8 @@ export const db = drizzle(sqlite, {
     peopleRelations,
     peopleToRelations,
     eventRelations,
+    templateRelations,
+    messageRelations,
   },
 });
 export type DatabaseType = typeof db;
