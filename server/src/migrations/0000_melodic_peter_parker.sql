@@ -27,13 +27,13 @@ CREATE TABLE `messages` (
 	`id` text PRIMARY KEY NOT NULL,
 	`image` text,
 	`message` text,
-	`event_type` text,
+	`eventId` text,
 	`sent` integer,
 	`template` text,
 	`receipt` text,
 	`created_at` text DEFAULT (current_timestamp) NOT NULL,
 	`updated_at` text DEFAULT (current_timestamp) NOT NULL,
-	FOREIGN KEY (`event_type`) REFERENCES `event_types`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`eventId`) REFERENCES `events`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`template`) REFERENCES `templates`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`receipt`) REFERENCES `people`(`id`) ON UPDATE no action ON DELETE no action
 );

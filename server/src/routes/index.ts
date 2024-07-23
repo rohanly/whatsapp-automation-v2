@@ -7,6 +7,8 @@ import { eventsRouter } from "./events";
 import { eventTypesRouter } from "./events-types";
 import { sessionRouter } from "./session.route";
 import { templateRouter } from "./template.route";
+import { messageRelations } from "~/models/messages";
+import { messageRouter } from "./messages.route";
 
 export const router = new Hono();
 
@@ -17,4 +19,5 @@ router.route("/people", peopleRouter);
 router.route("/people_relations", peopleRelationsRouter);
 router.route("/events", eventsRouter);
 router.route("/templates", templateRouter);
+router.route("/messages", messageRouter);
 router.route("/event_types", eventTypesRouter.getRouter());

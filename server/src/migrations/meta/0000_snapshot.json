@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "7d019856-2df8-4d51-b1e8-73381ac9c23a",
+  "id": "77885f88-d571-4c20-ad32-a7a480384488",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "event_types": {
@@ -202,8 +202,8 @@
           "notNull": false,
           "autoincrement": false
         },
-        "event_type": {
-          "name": "event_type",
+        "eventId": {
+          "name": "eventId",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -249,12 +249,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "messages_event_type_event_types_id_fk": {
-          "name": "messages_event_type_event_types_id_fk",
+        "messages_eventId_events_id_fk": {
+          "name": "messages_eventId_events_id_fk",
           "tableFrom": "messages",
-          "tableTo": "event_types",
+          "tableTo": "events",
           "columnsFrom": [
-            "event_type"
+            "eventId"
           ],
           "columnsTo": [
             "id"
