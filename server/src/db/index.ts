@@ -11,12 +11,16 @@ import {
   peopleRelations,
   peopleRelationsTable,
 } from "~/models/people-relations";
+import { usersTable } from "~/models/users";
+import { sessionsTable } from "~/models/sessions";
 
 config({ path: ".env" });
 
-const sqlite = new Database("database.db");
+export const sqlite = new Database("database.db");
 export const db = drizzle(sqlite, {
   schema: {
+    usersTable,
+    sessionsTable,
     peopleTable,
     peopleRelationsTable,
     relationTypesTable,

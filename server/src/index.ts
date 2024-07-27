@@ -6,17 +6,19 @@ import { jwt } from "hono/jwt";
 import { swaggerUI } from "@hono/swagger-ui";
 import { router } from "./routes";
 import { serveStatic } from "@hono/node-server/serve-static";
+import { Variables } from "./bindings";
+import { csrf } from "hono/csrf";
+import { authMiddleware } from "./middlewares/auth.middleware";
 
-const app = new Hono();
-
-app.get("/", (c) => {
-  return c.text("Hello Hono!");
-});
+const app = new Hono<{
+  Variables: Variables;
+}>();
 
 //middlewares
 app.use(poweredBy());
 app.use(logger());
 app.get("/_swagger", swaggerUI({ url: "/docs" }));
+app.use(csrf());
 
 app.use(
   "/*",
