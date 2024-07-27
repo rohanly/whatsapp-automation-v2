@@ -84,7 +84,7 @@ authRouter.post(
 
       c.header("Set-Cookie", cookie.serialize(), { append: true });
 
-      return c.json({ message: "Login successful!" });
+      return c.json(user);
     } catch (error) {
       return c.json({ error: error }, 500);
     }

@@ -1,59 +1,30 @@
-import { Navigate, createBrowserRouter } from "react-router-dom";
-import LoginPage from "./login";
-import DashboardPage from "./dashboard";
-import { ProtectedRoute } from "@/components/protected-route";
-import EventsPage from "./events";
-import PeoplePage from "./people";
-import TemplatesPage from "./templates";
-import MessagePage from "./playground";
-import PersonEditorPage from "./person-editor";
-import TemplateEditorPage from "./template-editor";
+import { getUser } from "@/api/auth-service";
+import { userState } from "@/atoms/user.atom";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { User } from "@/types";
+import { useQuery } from "@tanstack/react-query";
+import React, { useEffect } from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import { useRecoilState } from "recoil";
 
-const pages = createBrowserRouter([
-  {
-    path: "/login",
-    element: <LoginPage />,
-  },
+function Root() {
+  const [user, setUser] = useRecoilState(userState);
 
-  {
-    path: "/",
-    // TODO: to be removed
-    // element: <ProtectedRoute />,
-    children: [
-      {
-        path: "/",
-        element: <Navigate to="/dashboard" replace />,
-      },
-      {
-        path: "dashboard",
-        element: <DashboardPage />,
-      },
-      {
-        path: "events",
-        element: <EventsPage />,
-      },
-      {
-        path: "people",
-        element: <PeoplePage />,
-      },
-      {
-        path: "people/:id",
-        element: <PersonEditorPage />,
-      },
-      {
-        path: "templates",
-        element: <TemplatesPage />,
-      },
-      {
-        path: "templates/:id",
-        element: <TemplateEditorPage />,
-      },
-      {
-        path: "messages",
-        element: <MessagePage />,
-      },
-    ],
-  },
-]);
+  const { data, isLoading } = useQuery({
+    queryKey: ["getUser"],
+    queryFn: async () => {
+      const data = await getUser();
+      setUser(data);
+      return data;
+    },
+    retry: 0,
+    refetchInterval: 0,
+  });
 
-export default pages;
+  if (isLoading) {
+    return <p>loading...</p>;
+  }
+
+  return <Outlet />;
+}
+export default Root;

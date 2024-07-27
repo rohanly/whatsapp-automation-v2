@@ -12,8 +12,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { loginWithPassword } from "@/services/auth-service";
+import { loginWithPassword } from "@/api/auth-service";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useRecoilState } from "recoil";
+import { userState } from "@/atoms/user.atom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const LoginPage = () => {
   const {
@@ -25,15 +29,27 @@ const LoginPage = () => {
   });
   const navigate = useNavigate();
 
-  const onSubmit: SubmitHandler<FormFields> = async (data) => {
-    try {
-      const resp = await loginWithPassword(data.email, data.password);
-      console.log(resp);
+  const [user, setUser] = useRecoilState(userState);
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: (data: FormFields) =>
+      loginWithPassword(data.email, data.password),
+    onSuccess: (resp) => {
+      setUser(resp);
       navigate("/dashboard");
-    } catch (error) {
-      console.log(error);
-    }
+    },
+  });
+
+  const onSubmit: SubmitHandler<FormFields> = async (data) => {
+    mutation.mutate(data);
   };
+
+  useEffect(() => {
+    if (user?.id) {
+      navigate("/");
+    }
+  }, []);
 
   return (
     <div className="h-screen flex flex-col justify-center items-center  bg-neutral-50">
@@ -70,7 +86,11 @@ const LoginPage = () => {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              disabled={mutation.isPending}
+              className="w-full"
+            >
               Sign in
             </Button>
           </CardFooter>

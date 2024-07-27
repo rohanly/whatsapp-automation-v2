@@ -1,4 +1,4 @@
-import pages from "@/pages";
+import pages from "@/pages/_app";
 import { RouterProvider as ReactRouterProvider } from "react-router-dom";
 
 const RouterProvider = () => {

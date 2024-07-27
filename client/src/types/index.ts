@@ -71,3 +71,9 @@ export interface ITemplate {
 export interface ChatProps {
   messages: IMessage[];
 }
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+}

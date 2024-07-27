@@ -34,9 +34,11 @@ import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { logout } from "@/services/auth-service";
+import { logout } from "@/api/auth-service";
 import Logo from "./Logo";
 import RetroGrid from "./ui/retro-grid";
+import { useRecoilState } from "recoil";
+import { userState } from "@/atoms/user.atom";
 
 const navLinks = [
   {
@@ -77,9 +79,11 @@ export default function DashboardLayout({
 }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const [_, setUser] = useRecoilState(userState);
 
   const handleLogout = () => {
     logout();
+    setUser(undefined);
     navigate("/login");
   };
 
