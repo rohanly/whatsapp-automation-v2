@@ -1,16 +1,16 @@
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
 import { config } from "dotenv";
-import { peopleTable, peopleToRelations } from "./models/people";
-import { relationTypesTable } from "./models/relation-types";
-import { eventRelations, eventsTable } from "./models/events";
-import { eventTypesTable } from "./models/event-types";
-import { templateRelations, templatesTable } from "./models/templates";
-import { messageRelations, messagesTable } from "./models/messages";
+import { peopleTable, peopleToRelations } from "~/models/people";
+import { relationTypesTable } from "~/models/relation-types";
+import { eventRelations, eventsTable } from "~/models/events";
+import { eventTypesTable } from "~/models/event-types";
+import { templateRelations, templatesTable } from "~/models/templates";
+import { messageRelations, messagesTable } from "~/models/messages";
 import {
   peopleRelations,
   peopleRelationsTable,
-} from "./models/people-relations";
+} from "~/models/people-relations";
 
 config({ path: ".env" });
 

@@ -26,3 +26,6 @@ export const templateRelations = relations(templatesTable, ({ one }) => ({
     references: [eventTypesTable.id],
   }),
 }));
+
+export type InsertTemplate = typeof templatesTable.$inferInsert;
+export type SelectTemplate = typeof templatesTable.$inferSelect;

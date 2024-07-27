@@ -131,7 +131,7 @@ export function EditPeople({ id }: { id: string }) {
       metaData: person?.metaData,
       mobile: person?.mobile,
       name: person?.name,
-      salutation: person?.name,
+      salutation: person?.salutation,
       socialLink: person?.socialLink,
       relation: person?.relations?.map((r) => r?.relationType),
     });

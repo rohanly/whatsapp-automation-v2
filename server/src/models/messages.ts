@@ -41,3 +41,6 @@ export const messageRelations = relations(messagesTable, ({ one }) => ({
     references: [templatesTable.id],
   }),
 }));
+
+export type InsertMessage = typeof messagesTable.$inferInsert;
+export type SelectMessage = typeof messagesTable.$inferSelect;

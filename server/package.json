@@ -4,7 +4,8 @@
     "dev": "tsx watch src/index.ts",
     "make-migration": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate",
-    "studio": "drizzle-kit studio"
+    "studio": "drizzle-kit studio",
+    "db:seed": "tsx src/db/seed.ts"
   },
   "dependencies": {
     "@hono-storage/node-disk": "^0.0.15",
@@ -12,6 +13,7 @@
     "@hono/swagger-ui": "^0.4.0",
     "@hono/zod-validator": "^0.2.2",
     "better-sqlite3": "^11.1.2",
+    "canvas": "^2.11.2",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.32.0",
     "hono": "^4.5.1",
