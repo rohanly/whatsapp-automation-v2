@@ -1,8 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { addDays, addMonths, addYears, format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
-
-import { cn } from "@/lib/utils";
+import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -10,77 +6,34 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 
-export function DatePicker({ value, onChange }: any) {
-  const [date, setDate] = React.useState<Date>(value);
-
-  const selectedDate = date ? format(date, "PPP") : "Pick a date";
-  const selectedYear = date ? format(date, "yyyy") : "Pick Year";
-  const selectMonth = date ? format(date, "MMMM") : "Pick Year";
-
-  useEffect(() => {
-    onChange(date);
-  }, [date]);
-
+export function DatePicker({ date, setDate }: any) {
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}
           className={cn(
-            "justify-start text-left font-normal w-full",
+            "w-full justify-start text-left font-normal",
             !date && "text-muted-foreground"
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {selectedDate}
+          {date ? format(date, "PPP") : <span>Pick a date</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="flex w-auto flex-col space-y-2 p-2">
-        <div className="flex space-x-2">
-          <Select
-            onValueChange={(value) => {
-              setDate(addYears(new Date(), parseInt(value)));
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Year">{selectedYear}</SelectValue>
-            </SelectTrigger>
-            <SelectContent position="popper">
-              {[...Array(100).reverse().keys()].map((year) => (
-                <SelectItem key={year} value={(-1 * year).toString()}>
-                  {new Date().getFullYear() - year}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            onValueChange={(value) =>
-              setDate(addMonths(new Date(), parseInt(value)))
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Month">{selectMonth}</SelectValue>
-            </SelectTrigger>
-            <SelectContent position="popper">
-              {Array.from({ length: 12 }, (_, index) => index).map((month) => (
-                <SelectItem key={month} value={(month + 1).toString()}>
-                  {format(new Date(2000, month), "MMMM")}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="rounded-md border">
-          <Calendar mode="single" selected={date} onSelect={setDate} />
-        </div>
+      <PopoverContent align="center" className=" w-auto p-0">
+        <Calendar
+          mode="single"
+          captionLayout="dropdown-buttons"
+          selected={date}
+          onSelect={setDate}
+          fromYear={1960}
+          toYear={2030}
+        />
       </PopoverContent>
     </Popover>
   );

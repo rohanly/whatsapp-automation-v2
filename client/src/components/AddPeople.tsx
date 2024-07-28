@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/select";
 import { convertToFormData } from "@/utils";
 import { createPeople, createPeopleRelation } from "@/api/people.service";
+import { DatePicker } from "./DatePicker";
 
 export function AddPeople() {
   const [open, setOpen] = useState(false);
@@ -88,6 +89,8 @@ export function AddPeople() {
     mutation.mutate(data);
   };
 
+  console.log("PEOPLE ERROR: ", errors);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -129,35 +132,7 @@ export function AddPeople() {
               control={control}
               render={({ field }) => (
                 <div className="col-span-4 ">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          <span>{formatDate(field.value)} </span>
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="center">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <DatePicker date={field.value} setDate={field.onChange} />
                 </div>
               )}
             />

@@ -165,7 +165,7 @@ export function AddEvent() {
               control={control}
               render={({ field }) => (
                 <div className="col-span-4 ">
-                  <DatePicker value={field.value} onChange={field.onChange} />
+                  <DatePicker date={field.value} setDate={field.onChange} />
                 </div>
               )}
             />
@@ -214,9 +214,9 @@ export function AddEvent() {
                     <SelectValue placeholder="Select Template" />
                   </SelectTrigger>
                   <SelectContent>
-                    {templates?.map((p, i) => (
+                    {templates?.data?.map((p, i) => (
                       <SelectItem key={i} value={p.id}>
-                        {p.name}
+                        {p.eventType?.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
