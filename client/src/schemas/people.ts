@@ -1,8 +1,9 @@
+import { formatDate } from "@/utils/date";
 import { z } from "zod";
 
 export const personFormSchema = z.object({
   name: z.string().min(2),
-  dateOfBirth: z.date(),
+  dateOfBirth: z.date().transform(formatDate),
   salutation: z.string().optional(),
   relation: z
     .array(

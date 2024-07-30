@@ -1,4 +1,4 @@
-import { ArrowUpRight, MoreHorizontal } from "lucide-react";
+import { ArrowUpRight, LoaderCircleIcon, MoreHorizontal } from "lucide-react";
 
 import {
   Card,
@@ -30,15 +30,17 @@ import { generateMessageForEvent, getEventList } from "@/api/events.service";
 export default function DashboardEventList() {
   const { data: events, isLoading } = useQuery({
     queryKey: ["getEventList"],
-    queryFn: () => getEventList(),
+    queryFn: () =>
+      getEventList({ pageSize: 100, startDate: formatDate(new Date()) }),
   });
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <Card className="flex-1 h-full overflow-hidden">
+      {isLoading && (
+        <div className="bg-white w-full h-full flex justify-center items-center">
+          <LoaderCircleIcon className="text-black animate-spin w-10 h-10" />
+        </div>
+      )}
       <CardHeader className="flex flex-row items-center bgh">
         <div className="grid gap-2">
           <CardTitle>Events</CardTitle>
@@ -92,7 +94,7 @@ export const EventTableRow = ({ event }: any) => {
         title: "Message generated Successfully",
         action: (
           <ToastAction
-            onClick={() => navigate("/messages?id=" + event.person)}
+            onClick={() => navigate("/messages?id=" + event.person.id)}
             altText="show"
           >
             show
@@ -108,8 +110,8 @@ export const EventTableRow = ({ event }: any) => {
       <TableCell className="hidden md:table-cell">
         <Badge variant="outline">{event?.eventType?.name}</Badge>
       </TableCell>
-      {/* TODO: Add people relations */}
-      <TableCell>
+
+      <TableCell className="flex flex-wrap gap-1">
         {event?.person?.relations?.map((relation: any) => (
           <Badge key={relation.id} variant="outline">
             {relation?.relationType?.name}
@@ -117,30 +119,26 @@ export const EventTableRow = ({ event }: any) => {
         ))}
       </TableCell>
 
-      <TableCell className="hidden md:table-cell">
-        {formatDate(event?.date)}
-      </TableCell>
+      <TableCell className="hidden md:table-cell">{event?.date}</TableCell>
       <TableCell>
-        {/* <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button aria-haspopup="true" size="icon" variant="ghost">
-            <MoreHorizontal className="h-4 w-4" />
-            <span className="sr-only">Toggle menu</span>
+        {mutation.isPending ? (
+          <Button
+            onClick={() => mutation.mutate()}
+            variant="outline"
+            disabled={mutation.isPending}
+            className="w-[120px]"
+          >
+            <LoaderCircleIcon className="text-black animate-spin" />
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem>Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu> */}
-        <Button
-          onClick={() => mutation.mutate()}
-          variant="secondary"
-          disabled={mutation.isPending}
-        >
-          Generate
-        </Button>
+        ) : (
+          <Button
+            onClick={() => mutation.mutate()}
+            variant="outline"
+            disabled={mutation.isPending}
+          >
+            Generate
+          </Button>
+        )}
       </TableCell>
     </TableRow>
   );

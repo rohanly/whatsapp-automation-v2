@@ -72,7 +72,7 @@ export function AddEvent() {
 
   const { data: peopleList } = useQuery({
     queryKey: ["getPeopleList"],
-    queryFn: () => getPeopleList(),
+    queryFn: () => getPeopleList({ pageSize: 100 }),
   });
 
   const { data: eventTypes, ...eventTypeQuery } = useQuery({

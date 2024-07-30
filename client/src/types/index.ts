@@ -77,3 +77,10 @@ export interface User {
   name: string;
   email: string;
 }
+
+export type Pagination = {
+  pageIndex: number;
+  pageSize: number;
+  totalRows: number;
+  totalPage: number;
+};

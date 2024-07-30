@@ -1,8 +1,9 @@
+import { formatDate } from "@/utils/date";
 import { z } from "zod";
 
 export const eventFormSchema = z.object({
   name: z.string().min(2),
-  date: z.date(),
+  date: z.date().transform(formatDate),
   personId: z.string(),
   eventTypeId: z.string(),
   templateId: z.string().optional(),

@@ -1,5 +1,4 @@
 import { activeChatState } from "@/atoms/chatAtom";
-import { pb } from "@/lib/pocketbase";
 import { formatTimestamp, getImageURL } from "@/lib/utils";
 import { IMessage } from "@/types";
 import { useQuery } from "@tanstack/react-query";
@@ -9,6 +8,7 @@ import { useRecoilValue } from "recoil";
 import { Button } from "./ui/button";
 import { CopyIcon } from "lucide-react";
 import { toast } from "./ui/use-toast";
+import { getMessagesByPerson, getPersonById } from "@/api/people.service";
 
 const MessageList: React.FC = () => {
   const [searchParams, _] = useSearchParams();
@@ -17,19 +17,15 @@ const MessageList: React.FC = () => {
   const id = searchParams.get("id");
 
   const { data: messages, isLoading } = useQuery({
-    queryKey: ["getMessages", id],
-    queryFn: () =>
-      pb.collection("messages").getFullList({
-        filter: `receipt="${id}"`,
-        expand: "receipt, template",
-      }),
+    queryKey: ["getMessagesByPerson", id],
+    queryFn: () => getMessagesByPerson(id),
   });
 
   const { data: person, ...personQuery } = useQuery({
     queryKey: ["getPersonById", id],
     queryFn: () => {
       if (!id) return null;
-      return pb.collection("people").getOne(id);
+      return getPersonById(id);
     },
   });
 
@@ -46,7 +42,7 @@ const MessageList: React.FC = () => {
           person && (
             <div className="w-fit mx-auto flex flex-col p-2 justify-center items-center ">
               <img
-                src={getImageURL(person, person?.image)}
+                src={person?.image}
                 alt={person?.name}
                 className="w-12 h-12 object-contain rounded-full"
               />
@@ -74,14 +70,9 @@ const MessageList: React.FC = () => {
 export default MessageList;
 
 export const MessageItem = ({ message }: any) => {
-  const url = getImageURL(
-    message.expand?.template,
-    message.expand?.template.image
-  );
-
   const copyToClipboard = async (
     htmlContent: string = message.message,
-    imageSrc: string = url
+    imageSrc: string = message.image
   ) => {
     try {
       const blob = await fetch(imageSrc).then((r) => r.blob());
@@ -122,8 +113,8 @@ export const MessageItem = ({ message }: any) => {
       <div className="w-full max-w-md ml-auto m-3 bg-white/80 p-3 border-y shadow rounded">
         <div className="space-y-4 items-center">
           <img
-            src={url}
-            alt={message.expand?.receipt.name}
+            src={message.image}
+            alt={message.receipt.name}
             className="object-contain rounded border max-h-[400px] mx-auto"
           />
           <div className="">
@@ -134,7 +125,7 @@ export const MessageItem = ({ message }: any) => {
           </div>
           <div className="flex-1 flex flex-col justify-end text-right w-full ">
             <p className="w-full line-clamp-1 font-semibold text-sm text-black/40">
-              {formatTimestamp(message.created)}
+              {formatTimestamp(message.createdAt)}
             </p>
           </div>
         </div>

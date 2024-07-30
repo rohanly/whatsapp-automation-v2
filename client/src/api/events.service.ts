@@ -1,7 +1,24 @@
 import API from ".";
 
-export const getEventList = async () => {
-  const res = await API.get("/api/events");
+export const getEventList = async ({
+  pageIndex = 1,
+  pageSize = 10,
+  startDate,
+  endDate,
+}: {
+  pageIndex?: number;
+  pageSize?: number;
+  startDate?: string;
+  endDate?: string;
+}) => {
+  const res = await API.get("/api/events", {
+    params: {
+      pageIndex,
+      pageSize,
+      startDate,
+      endDate,
+    },
+  });
   return res.data;
 };
 
@@ -15,12 +32,7 @@ export const createEvent = async (data: any) => {
   return res.data;
 };
 
-// TODO: make generate endpoint
 export const generateMessageForEvent = async (eventId: string) => {
-  const res = await API.get(`/api/events/${eventId}/generate`, {
-    params: {
-      populate: "*",
-    },
-  });
+  const res = await API.post(`/api/events/${eventId}/generate_message`, {});
   return res.data;
 };

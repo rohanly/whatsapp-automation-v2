@@ -142,8 +142,7 @@ export const columns: ColumnDef<People>[] = [
       );
     },
     cell: ({ row }) => {
-      const dob = row.getValue("dateOfBirth");
-      return <div className="lowercase">{formatDate(dob)}</div>;
+      return <div className="lowercase">{row.getValue("dateOfBirth")}</div>;
     },
   },
   {
@@ -223,7 +222,7 @@ export const columns: ColumnDef<People>[] = [
 export function PeopleList() {
   const { data: people, isLoading } = useQuery({
     queryKey: ["getPeopleList"],
-    queryFn: getPeopleList,
+    queryFn: () => getPeopleList(),
   });
 
   const queryClient = useQueryClient();

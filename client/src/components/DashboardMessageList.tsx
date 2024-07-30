@@ -12,15 +12,12 @@ import { formatTimestamp, getImageURL } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getMessagesList } from "@/api/messages.service";
 
 function DashboardMessageList() {
   const { data: messages, isLoading } = useQuery({
-    queryKey: ["getMessages"],
-    queryFn: () =>
-      pb.collection("messages").getList(1, 10, {
-        sort: "-created",
-        expand: "receipt, template",
-      }),
+    queryKey: ["getMessagesList"],
+    queryFn: () => getMessagesList(),
   });
 
   return (
@@ -41,7 +38,7 @@ function DashboardMessageList() {
         {isLoading ? (
           <p>loading...</p>
         ) : (
-          messages?.items?.map((message) => (
+          messages?.data?.map((message) => (
             <MessageItem key={message.id} message={message} />
           ))
         )}
@@ -57,17 +54,12 @@ const MessageItem: React.FC<any> = ({ message }) => {
     <div className="w-full p-4 border-y border-grey-200">
       <div className="flex gap-4 items-center ">
         <img
-          src={getImageURL(
-            message?.expand?.receipt,
-            message?.expand?.receipt?.image
-          )}
-          alt={message?.expand?.receipt?.name}
+          src={message?.receipt?.image}
+          alt={message?.receipt?.name}
           className="w-12 h-12 object-contain rounded-full"
         />
         <div className="flex-1">
-          <p className="font-semibold text-base">
-            {message?.expand?.receipt?.name}
-          </p>
+          <p className="font-semibold text-base">{message?.receipt?.name}</p>
           <div
             className="w-full line-clamp-1 font-normal text-sm text-black/40"
             dangerouslySetInnerHTML={{
@@ -77,7 +69,7 @@ const MessageItem: React.FC<any> = ({ message }) => {
         </div>
         <div className="h-10 flex flex-col justify-start">
           <p className="w-full line-clamp-1 font-semibold text-xs text-black/40">
-            {formatTimestamp(message?.created)}
+            {formatTimestamp(message?.createdAt)}
           </p>
         </div>
       </div>

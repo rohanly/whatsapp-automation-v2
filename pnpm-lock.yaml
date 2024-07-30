@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -216,9 +216,6 @@ importers:
       tsx:
         specifier: ^4.7.1
         version: 4.7.1
-      vite-plugin-pwa:
-        specifier: ^0.20.1
-        version: 0.20.1(vite@5.0.0)(workbox-build@7.1.1)(workbox-window@7.1.0)
 
 packages:
 

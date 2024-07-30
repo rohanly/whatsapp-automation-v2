@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { db } from "~/db";
-import { eq, sql } from "drizzle-orm";
+import { and, between, count, eq, SQL, sql } from "drizzle-orm";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { eventsTable } from "~/models/events";
@@ -25,10 +25,24 @@ eventsRouter.post("/", async (c) => {
 });
 
 eventsRouter.get("/", async (c) => {
-  let { page, pageSize, date } = c.req.query() as any;
+  let { pageIndex, pageSize, startDate, endDate } = c.req.query() as any;
 
-  page = parseInt(page) || 1;
+  pageIndex = parseInt(pageIndex) || 1;
   pageSize = parseInt(pageSize) || 10;
+  endDate = endDate ?? startDate;
+
+  const filters: SQL[] = [];
+
+  if (startDate) {
+    filters.push(between(eventsTable.date, startDate, endDate));
+  }
+
+  const pageCountResult = await db
+    .select({ totalRows: count() })
+    .from(eventsTable)
+    .where(and(...filters));
+
+  const { totalRows } = pageCountResult[0];
 
   try {
     // Retrieve paginated people data with relations
@@ -45,13 +59,21 @@ eventsRouter.get("/", async (c) => {
         },
         eventType: true,
       },
-      where: date ? eq(eventsTable.date, date) : undefined,
+      where: and(...filters),
       limit: pageSize,
-      offset: (page - 1) * pageSize,
+      offset: (pageIndex - 1) * pageSize,
     });
 
     // Return response without additional nesting
-    return c.json({ data: people, pagination: { page, pageSize } });
+    return c.json({
+      data: people,
+      pagination: {
+        pageIndex: pageIndex,
+        pageSize,
+        totalRows,
+        totalPage: Math.ceil(totalRows / pageSize),
+      },
+    });
   } catch (error) {
     console.log("ERROR: ", error);
     return c.json({ message: "Failed to retrieve people", error }, 500);

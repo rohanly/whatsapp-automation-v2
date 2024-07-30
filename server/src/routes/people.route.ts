@@ -5,6 +5,7 @@ import { peopleTable } from "~/models/people";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { storage } from "~/storage";
+import { messagesTable } from "~/models/messages";
 
 export const peopleRouter = new Hono();
 
@@ -124,5 +125,29 @@ peopleRouter.delete("/:id", async (c) => {
   } catch (error) {
     console.log("ERROR: ", error);
     return c.json({ message: "Failed to retrieve person", error }, 500);
+  }
+});
+
+peopleRouter.get("/:id/messages", async (c) => {
+  const id = c.req.param("id");
+
+  try {
+    // Retrieve person
+    const messages = await db.query.messagesTable.findMany({
+      where: eq(messagesTable.receiptId, id),
+      with: {
+        receipt: true,
+      },
+    });
+
+    if (!messages) {
+      return c.json({ message: "No Message found" }, 404);
+    }
+
+    // Return response
+    return c.json(messages);
+  } catch (error) {
+    console.error("Failed to retrieve Message", error);
+    return c.json({ message: "Failed to retrieve Message", error }, 500);
   }
 });

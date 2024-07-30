@@ -54,10 +54,9 @@ export function AddPeople() {
   const mutation = useMutation({
     mutationKey: ["people"],
     mutationFn: async (data: FormFields) => {
-      const { relation, dateOfBirth, image, ...rest } = data;
+      const { relation, image, ...rest } = data;
       const formData = convertToFormData({
         ...rest,
-        dateOfBirth: dateOfBirth?.toISOString(),
         image: image?.[0],
       });
 

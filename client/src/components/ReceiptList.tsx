@@ -7,16 +7,14 @@ import { activeChatState } from "@/atoms/chatAtom";
 import { pb } from "@/lib/pocketbase";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { getPeopleList } from "@/api/people.service";
 
 interface ReceiptProps {}
 
 const ReceiptList: React.FC<ReceiptProps> = ({}) => {
   const { data: receipts, isLoading } = useQuery({
-    queryKey: ["getPeople"],
-    queryFn: () =>
-      pb.collection("people").getFullList({
-        expand: "last_message",
-      }),
+    queryKey: ["getPeopleList"],
+    queryFn: () => getPeopleList({ pageSize: 100 }),
   });
 
   if (isLoading) return <p>loading...</p>;
@@ -28,7 +26,7 @@ const ReceiptList: React.FC<ReceiptProps> = ({}) => {
         <CardDescription>Recently sent messages</CardDescription>
       </div>
       <div className="flex-1 h-full overflow-auto">
-        {receipts?.map((receipt) => (
+        {receipts?.data?.map((receipt) => (
           <ReceiptItem key={receipt.id} receipt={receipt} />
         ))}
       </div>
@@ -51,7 +49,7 @@ const ReceiptItem: React.FC<any> = ({ receipt }) => {
     >
       <div className="flex gap-4 items-center ">
         <img
-          src={getImageURL(receipt, receipt.image)}
+          src={receipt.image}
           alt={receipt.name}
           className="w-12 h-12 object-contain rounded-full"
         />

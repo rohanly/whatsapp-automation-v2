@@ -38,7 +38,7 @@ import { pb } from "@/lib/pocketbase";
 import { useQuery } from "@tanstack/react-query";
 import { formatDate } from "@/utils/date";
 import { Badge } from "./ui/badge";
-import { Event, People } from "@/types";
+import { Event, Pagination, People } from "@/types";
 import { getEventList } from "@/api/events.service";
 
 export const columns: ColumnDef<Event>[] = [
@@ -95,9 +95,7 @@ export const columns: ColumnDef<Event>[] = [
       );
     },
     cell: ({ row }) => {
-      return (
-        <div className="lowercase">{formatDate(row.getValue("date"))}</div>
-      );
+      return <div className="lowercase">{row.getValue("date")}</div>;
     },
   },
 
@@ -125,9 +123,11 @@ export const columns: ColumnDef<Event>[] = [
 ];
 
 export function EventList() {
+  const [pageIndex, setPageIndex] = React.useState(1);
+
   const { data: events, isLoading } = useQuery({
-    queryKey: ["getEventList"],
-    queryFn: () => getEventList(),
+    queryKey: ["getEventList", pageIndex],
+    queryFn: () => getEventList({ pageIndex }),
   });
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -144,10 +144,6 @@ export function EventList() {
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
       sorting,
@@ -160,8 +156,6 @@ export function EventList() {
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
-  console.log("EVENTS: ", events);
 
   return (
     <div className="w-full">
@@ -253,23 +247,22 @@ export function EventList() {
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          Total {events?.pagination?.totalRows} row(s).
         </div>
         <div className="space-x-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => setPageIndex((p) => p - 1)}
+            disabled={pageIndex == 1}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() => setPageIndex((p) => p + 1)}
+            disabled={pageIndex >= events?.pagination?.totalPage}
           >
             Next
           </Button>

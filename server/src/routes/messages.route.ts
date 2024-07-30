@@ -16,6 +16,7 @@ messageRouter.post("/", storage.single("image"), async (c) => {
 
     return c.json(message[0]);
   } catch (error) {
+    console.log("ERR: ", error);
     return c.json({ message: "Failed to send the messages", error }, 500);
   }
 });

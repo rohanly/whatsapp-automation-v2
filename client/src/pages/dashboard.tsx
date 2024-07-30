@@ -6,10 +6,10 @@ import Meteors from "@/components/ui/meteors";
 export default function DashboardPage() {
   return (
     <DashboardLayout>
-      <main className="h-full flex flex-col lg:flex-row gap-8">
+      <section className="flex h-full  flex-col lg:flex-row gap-8 overflow-y-auto">
         <DashboardEventList />
-        {/* <DashboardMessageList /> */}
-      </main>
+        <DashboardMessageList />
+      </section>
     </DashboardLayout>
   );
 }
