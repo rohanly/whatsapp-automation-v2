@@ -10,14 +10,10 @@ import { templateRouter } from "./template.route";
 import { messageRelations } from "~/models/messages";
 import { messageRouter } from "./messages.route";
 import { authRouter } from "./auth.route";
-import { authMiddleware } from "~/middlewares/auth.middleware";
 
 export const router = new Hono();
 
 router.route("/auth", authRouter);
-
-router.use("*", authMiddleware);
-
 router.route("/sessions", sessionRouter);
 router.route("/users", userRouter);
 router.route("/relation_types", relationRouter);

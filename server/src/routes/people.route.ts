@@ -6,8 +6,9 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { storage } from "~/storage";
 import { messagesTable } from "~/models/messages";
+import { createPrivateRouter } from "~/builder";
 
-export const peopleRouter = new Hono();
+export const peopleRouter = createPrivateRouter();
 
 peopleRouter.post("/", storage.single("image"), async (c) => {
   try {

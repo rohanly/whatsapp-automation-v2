@@ -3,6 +3,10 @@
   "version": "2.0.0",
   "license": "MIT",
   "private": true,
+  "scripts": {
+    "dev-server": "pnpm -F=server run dev",
+     "dev-client": "pnpm -F=client run dev"
+  },
   "workspaces": [
     "client",
     "server"

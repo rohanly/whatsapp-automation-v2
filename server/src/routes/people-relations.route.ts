@@ -4,8 +4,9 @@ import { eq } from "drizzle-orm";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { peopleRelationsTable } from "~/models/people-relations";
+import { createPrivateRouter } from "~/builder";
 
-export const peopleRelationsRouter = new Hono();
+export const peopleRelationsRouter = createPrivateRouter();
 
 peopleRelationsRouter.post("/", async (c) => {
   const relation = await c.req.json();

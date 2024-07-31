@@ -1,14 +1,13 @@
 import { zValidator } from "@hono/zod-validator";
 import { eq } from "drizzle-orm";
-import { Hono } from "hono";
 import { Scrypt } from "lucia";
 import { z } from "zod";
-import { Variables } from "~/bindings";
+import { createPublicRouter } from "~/builder";
 import { db } from "~/db";
 import { lucia } from "~/db/lucia";
 import { usersTable } from "~/models/users";
 
-export const authRouter = new Hono<{ Variables: Variables }>();
+export const authRouter = createPublicRouter();
 
 authRouter.post(
   "/signup",

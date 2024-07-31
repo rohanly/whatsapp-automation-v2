@@ -66,11 +66,8 @@ export function EditPeople({ id }: { id: string }) {
   const mutation = useMutation({
     mutationKey: ["people"],
     mutationFn: async (data: FormFields) => {
-      const { relation, dateOfBirth, ...rest } = data;
-      const formData = convertToFormData({
-        ...rest,
-        dateOfBirth: dateOfBirth?.toISOString(),
-      });
+      const { relation, ...rest } = data;
+      const formData = convertToFormData(rest);
 
       const person = await editPersonById(id, formData);
 

@@ -5,8 +5,9 @@ import { templatesTable } from "~/models/templates";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { storage } from "~/storage";
+import { createPrivateRouter } from "~/builder";
 
-export const templateRouter = new Hono();
+export const templateRouter = createPrivateRouter();
 
 templateRouter.post("/", storage.single("image"), async (c) => {
   try {

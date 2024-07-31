@@ -8,8 +8,9 @@ import { SelectTemplate, templatesTable } from "~/models/templates";
 import { InsertMessage, messagesTable } from "~/models/messages";
 import { getRandomIndex, parseTemplate } from "~/utils/templates.utils";
 import { CanvasService } from "~/services/canvas/generate-template";
+import { createPrivateRouter } from "~/builder";
 
-export const eventsRouter = new Hono();
+export const eventsRouter = createPrivateRouter();
 
 eventsRouter.post("/", async (c) => {
   try {

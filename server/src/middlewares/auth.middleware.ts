@@ -3,7 +3,6 @@ import { getCookie } from "hono/cookie";
 import { lucia } from "~/db/lucia";
 
 export async function authMiddleware(c: Context, next: Next) {
-  console.log("AUTH ");
   const sessionId = getCookie(c, lucia.sessionCookieName);
 
   if (!sessionId) {
