@@ -7,9 +7,9 @@ import { eventsRouter } from "./events";
 import { eventTypesRouter } from "./events-types";
 import { sessionRouter } from "./session.route";
 import { templateRouter } from "./template.route";
-import { messageRelations } from "~/models/messages";
 import { messageRouter } from "./messages.route";
 import { authRouter } from "./auth.route";
+import { pushNotificationsRouter } from "./push-notifications.route";
 
 export const router = new Hono();
 
@@ -23,3 +23,4 @@ router.route("/events", eventsRouter);
 router.route("/templates", templateRouter);
 router.route("/messages", messageRouter);
 router.route("/event_types", eventTypesRouter.getRouter());
+router.route("/push_notifications", pushNotificationsRouter);

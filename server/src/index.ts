@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { logger } from "hono/logger";
@@ -7,6 +9,7 @@ import { swaggerUI } from "@hono/swagger-ui";
 import { router } from "./routes";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { Variables } from "./bindings";
+import { errorMiddleware } from "./middlewares/error.middleware";
 
 const app = new Hono<{
   Variables: Variables;
@@ -23,6 +26,7 @@ app.use(
     root: "./public",
   })
 );
+app.use("*", errorMiddleware);
 
 app.route("/api", router);
 

@@ -7,3 +7,4 @@ export * from "./relation-types";
 export * from "./sessions";
 export * from "./templates";
 export * from "./users";
+export * from "./push-notifications";

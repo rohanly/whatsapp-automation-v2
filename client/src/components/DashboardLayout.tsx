@@ -39,6 +39,7 @@ import Logo from "./Logo";
 import RetroGrid from "./ui/retro-grid";
 import { useRecoilState } from "recoil";
 import { userState } from "@/atoms/user.atom";
+import NotificationButton from "./NotificationButton";
 
 const navLinks = [
   {
@@ -96,10 +97,11 @@ export default function DashboardLayout({
               <Logo />
               <span className="">Lemon Yellow</span>
             </Link>
-            <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
+            {/* <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
               <Bell className="h-4 w-4" />
               <span className="sr-only">Toggle notifications</span>
-            </Button>
+            </Button> */}
+            <NotificationButton />
           </div>
           <div className="flex-1">
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
