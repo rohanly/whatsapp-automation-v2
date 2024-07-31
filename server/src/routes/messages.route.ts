@@ -95,9 +95,8 @@ messageRouter.get("/:id", async (c) => {
 messageRouter.patch("/:id", storage.single("image"), async (c) => {
   const id = c.req.param("id");
   const body: any = await c.req.parseBody();
-  //@ts-expect-error
   if (c.var.imageUrl) {
-    body.image = (c.var as any).imageUrl;
+    body.image = c.var.imageUrl;
   }
 
   try {

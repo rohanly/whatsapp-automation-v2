@@ -1,86 +1,109 @@
-export type Relation = {
-  id: string;
-  label: string;
-  value: string;
-};
-
-export type People = {
-  image?: string;
-  id: string;
-  created: Date;
-  updated: Date;
-  name: string;
-  date_of_birth: Date;
-  salutation: string;
-  relation: string;
-  additional_info?: string;
-  expand?: {
-    relation: string[];
-  };
-  gender: string;
-  meta_data?: any;
-  email?: string;
-  mobile?: string;
-  company?: string;
-  social_link?: string;
-};
-
-export type Event = {
-  id: string;
-  collectionId: string;
-  collectionName: string;
-  created: Date;
-  updated: Date;
-  name: string;
-  date: Date;
-  expand: {
-    people: People;
-  };
-  person: string[];
-  every_year: boolean;
-};
-
-// Define the type for your message data
-export interface IMessage {
-  id: string;
-  image: string;
-  message: string;
-  created: string;
-  receipt: string;
-  sent: boolean;
-  template: string;
-  expand?: { receipt: IReceipt; template: ITemplate };
-}
-
-// Define the type for receipt data
-export interface IReceipt {
-  id: string;
-  name: string;
-  salutation: string;
-  image: string;
-}
-
-// Define the type for template data
-export interface ITemplate {
-  id: string;
-  message: string;
-  image: string;
-}
-
-// Define the type for the chat component props
-export interface ChatProps {
-  messages: IMessage[];
-}
-
 export interface User {
   id: string;
   name: string;
   email: string;
 }
 
+export type EventType = {
+  id: string;
+  name: string;
+  description: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type RelationType = {
+  id: string;
+  name: string;
+  chapter: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type Relation = {
+  id: string;
+  personId: string;
+  relationTypeId: string;
+  createdAt: string;
+  updatedAt: string;
+  relationType: RelationType;
+};
+
+export type Person = {
+  id: string;
+  name: string;
+  dateOfBirth: string;
+  salutation: string;
+  metaData: any | null;
+  additionalInfo: any | null;
+  image: string;
+  email: string;
+  gender: string;
+  mobile: string | null;
+  extendedFamily: any | null;
+  company: any | null;
+  socialLink: any | null;
+  ex: any | null;
+  createdAt: string;
+  updatedAt: string;
+  relations: Relation[];
+};
+
+export type Event = {
+  id: string;
+  name: string;
+  date: string;
+  personId: string;
+  everyYear: any | null;
+  eventTypeId: string;
+  messageCount: any | null;
+  additionalInfo: any | null;
+  templateId: any | null;
+  createdAt: string;
+  updatedAt: string;
+  person: Person;
+  eventType: EventType;
+};
+
+export type Template = {
+  id: string;
+  image: string;
+  message: string;
+  eventTypeId: string;
+  name: string | null;
+  createdAt: string;
+  updatedAt: string;
+  eventType: EventType;
+};
+
+export type Message = {
+  id: string;
+  image: string;
+  message: string;
+  eventId: string;
+  sent: boolean;
+  templateId: string;
+  receiptId: string;
+  createdAt: string;
+  updatedAt: string;
+  event: Event;
+  receipt: Person;
+  template?: Template;
+};
+
 export type Pagination = {
   pageIndex: number;
   pageSize: number;
   totalRows: number;
   totalPage: number;
+};
+
+export type EventsApiResponse = {
+  data: Event[];
+  pagination: Pagination;
+};
+
+export type TemplatesApiResponse = {
+  data: Template[];
+  pagination: Pagination;
 };

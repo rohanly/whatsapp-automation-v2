@@ -38,7 +38,7 @@ import { pb } from "@/lib/pocketbase";
 import { useQuery } from "@tanstack/react-query";
 import { formatDate } from "@/utils/date";
 import { Badge } from "./ui/badge";
-import { Event, Pagination, People } from "@/types";
+import { Event, Pagination } from "@/types";
 import { getEventList } from "@/api/events.service";
 
 export const columns: ColumnDef<Event>[] = [
@@ -47,8 +47,7 @@ export const columns: ColumnDef<Event>[] = [
     header: "Name",
 
     cell: ({ row }) => {
-      const people: any = row.getValue("person");
-      return <div className="flex gap-1">{people?.name}</div>;
+      return <div className="flex gap-1">{row.original.person.name}</div>;
     },
   },
 
@@ -56,9 +55,11 @@ export const columns: ColumnDef<Event>[] = [
     accessorKey: "eventType",
     header: "Event",
     cell: ({ row }) => {
-      const eventType: any = row.getValue("eventType");
-
-      return <div className="capitalize font-medium">{eventType?.name}</div>;
+      return (
+        <div className="capitalize font-medium">
+          {row.original.eventType.name}
+        </div>
+      );
     },
   },
 
@@ -66,11 +67,9 @@ export const columns: ColumnDef<Event>[] = [
     accessorKey: "person.relation",
     header: () => <div className="text-left">Relation(s)</div>,
     cell: ({ row }) => {
-      const person: any = row.getValue("person");
-
       return (
         <div className="flex gap-1">
-          {person?.relations?.map((relation: any) => (
+          {row.original.person?.relations?.map((relation) => (
             <Badge variant="outline" key={relation?.id}>
               {relation?.relationType?.name}
             </Badge>

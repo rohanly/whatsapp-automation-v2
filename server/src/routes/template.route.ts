@@ -12,7 +12,7 @@ export const templateRouter = createPrivateRouter();
 templateRouter.post("/", storage.single("image"), async (c) => {
   try {
     const body: any = await c.req.parseBody();
-    body.image = (c.var as any).imageUrl;
+    body.image = c.var.imageUrl;
 
     const person = await db.insert(templatesTable).values(body).returning();
 
@@ -81,9 +81,8 @@ templateRouter.get("/:id", async (c) => {
 templateRouter.patch("/:id", storage.single("image"), async (c) => {
   const id = c.req.param("id");
   const body: any = await c.req.parseBody();
-  //@ts-expect-error
   if (c.var.imageUrl) {
-    body.image = (c.var as any).imageUrl;
+    body.image = c.var.imageUrl;
   }
 
   try {

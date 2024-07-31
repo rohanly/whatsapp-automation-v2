@@ -1,3 +1,4 @@
+import { Message, Pagination, Person } from "@/types";
 import API from ".";
 
 export const getPeopleList = async (params?: {
@@ -6,9 +7,12 @@ export const getPeopleList = async (params?: {
   startDate?: string;
   endDate?: string;
 }) => {
-  const res = await API.get("/api/people", {
-    params,
-  });
+  const res = await API.get<{ data: Person[]; pagination: Pagination }>(
+    "/api/people",
+    {
+      params,
+    }
+  );
   return res.data;
 };
 
@@ -43,6 +47,6 @@ export const deletePeopleRelation = async (personId: string) => {
 };
 
 export const getMessagesByPerson = async (id: string) => {
-  const res = await API.get(`/api/people/${id}/messages`);
+  const res = await API.get<Message[]>(`/api/people/${id}/messages`);
   return res.data;
 };

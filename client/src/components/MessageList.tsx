@@ -1,14 +1,13 @@
 import { activeChatState } from "@/atoms/chatAtom";
 import { formatTimestamp, getImageURL } from "@/lib/utils";
-import { IMessage } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useRecoilValue } from "recoil";
 import { Button } from "./ui/button";
 import { CopyIcon } from "lucide-react";
 import { toast } from "./ui/use-toast";
 import { getMessagesByPerson, getPersonById } from "@/api/people.service";
+import { Message } from "@/types";
 
 const MessageList: React.FC = () => {
   const [searchParams, _] = useSearchParams();
@@ -69,7 +68,7 @@ const MessageList: React.FC = () => {
 
 export default MessageList;
 
-export const MessageItem = ({ message }: any) => {
+export const MessageItem = ({ message }: { message: Message }) => {
   const copyToClipboard = async (
     htmlContent: string = message.message,
     imageSrc: string = message.image

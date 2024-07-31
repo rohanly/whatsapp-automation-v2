@@ -4,4 +4,5 @@ import { User } from "lucia";
 export type Variables = {
   user: User | null;
   session: Session | null;
+  imageUrl?: string;
 };
