@@ -1,5 +1,5 @@
 {
-    "name": "LY Currency",
+    "name": "Whatsapp Automation",
     "short_name": "LY",
     "icons": [
       {
@@ -29,7 +29,7 @@
     ],
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#FFFFFF",
-    "theme_color": "#FFFFFF",
-    "description": "LY Curreny"
+    "background_color": "#0000",
+    "theme_color": "#0000",
+    "description": "Whatsapp Automation"
   }

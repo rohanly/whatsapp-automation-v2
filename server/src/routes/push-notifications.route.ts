@@ -23,7 +23,9 @@ router.post("/subscribe", async (c) => {
     throw new Error("Unauthorized");
   }
 
-  const { subscription } = c.req.json();
+  const { subscription } = await c.req.json();
+
+  console.log("--->", subscription);
 
   const resp = await db
     .insert(pushNotificationsTable)

@@ -64,57 +64,19 @@ self.addEventListener("pushsubscriptionchange", (event) => {
 
 // Handle push notifications
 self.addEventListener("push", (event) => {
-  const payload = event.data.json();
+  const payload = { title: "Default title", body: "Default body" };
 
-  event.waitUntil(
-    self.registration.showNotification("Your App Name", {
-      body: payload.message,
-    })
-  );
+  const options = {
+    body: payload.body,
+    icon: "icon.png", // Path to an icon image
+    badge: "badge.png", // Path to a badge image
+  };
+
+  event.waitUntil(self.registration.showNotification(payload.title, options));
 });
 
 // Subscribe to push notifications
-self.addEventListener("activate", (event) => {
-  console.log("ACTIVATE");
-
-  /**
-   * @param {ExtendableEvent} event
-   */
-  event.waitUntil(
-    self.registration.pushManager
-      .subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: applicationServerKey,
-      })
-      .then((subscription) => {
-        console.log("Push subscription successful:", subscription);
-        // Send the subscription to the server if needed
-        sendSubscriptionToServer(subscription);
-      })
-      .catch((error) => {
-        console.error("Error subscribing to push notifications:", error);
-      })
-  );
-});
-
-/**
- * @param {any} subscription
- */
-const sendSubscriptionToServer = async (subscription) => {
-  // Send the subscription details to your server using a fetch or other method
-  try {
-    const resp = await fetch("/api/push_notifications/subscribe", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ subscription }),
-    });
-    console.log(resp);
-  } catch (err) {
-    console.log(err);
-  }
-};
+self.addEventListener("activate", (event) => {});
 
 // Register route for handling push messages
 registerRoute(
@@ -135,28 +97,3 @@ setCatchHandler(({ event }) => {
 
   return Response.error();
 });
-
-/**
- * @param {string} base64String
- * @returns {Uint8Array}
- */
-function urlBase64ToUint8Array(base64String) {
-  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding)
-    .replace(/\-/g, "+")
-    .replace(/_/g, "/");
-
-  const rawData = atob(base64);
-  const buffer = new Uint8Array(rawData.length);
-
-  for (let i = 0; i < rawData.length; i++) {
-    buffer[i] = rawData.charCodeAt(i);
-  }
-
-  return buffer;
-}
-
-/** @type {Uint8Array} */
-const applicationServerKey = urlBase64ToUint8Array(
-  "BKV5YbAjaj4F6NTeJ3dm3oTMYoaLCOPn2OzaQP0zmr98uvKCij4R0hZwBHIeW-3_nz3DdLfWcke_Oyjqb5-lRYg"
-);
